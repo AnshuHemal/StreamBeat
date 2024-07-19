@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/lightTheme"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:id="@+id/llSearchItem"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/albumSearchImage"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/img_ws" />
+
+        <LinearLayout
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:ellipsize="end"
+                android:id="@+id/albumSearchName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Track Name"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:fontFamily="@font/mulish_medium"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Album"
+                    android:textColor="#e5e5e5"
+                    android:fontFamily="@font/mulish_medium"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnPlayPause"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/dots"
+            app:tint="#FFFFFF"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

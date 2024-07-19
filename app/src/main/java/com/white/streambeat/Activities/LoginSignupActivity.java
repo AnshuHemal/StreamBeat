@@ -1,0 +1,155 @@
+package com.white.streambeat.Activities;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
+import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.R;
+import com.white.streambeat.databinding.ActivityLoginSignupBinding;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+public class LoginSignupActivity extends AppCompatActivity {
+    ActivityLoginSignupBinding binding;
+    FirebaseAuth auth;
+    FirebaseUser firebaseUser;
+    PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    String mVerificationId;
+    PhoneAuthProvider.ForceResendingToken mResendToken;
+    String phone;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        binding = ActivityLoginSignupBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        auth = FirebaseAuth.getInstance();
+
+        binding.btnContinue.setOnClickListener(v -> {
+            if (binding.btnContinue.getText().equals("Continue")) {
+                if (checkUtilsAreFillOrNot()) {
+                    phone = binding.ccp.getSelectedCountryCodeWithPlus() + binding.phoneNumber.getText().toString();
+                    startPhoneNumberVerification(phone);
+                }
+            } else {
+                String otp = binding.etCode.getText().toString();
+                PhoneAuthCredential credential = null;
+                if (!TextUtils.isEmpty(binding.etCode.getText()) || !otp.contains(" ")) {
+                    credential = PhoneAuthProvider.getCredential(mVerificationId, otp);
+                    signInWithPhoneAuthCredential(credential);
+                } else {
+                    binding.etCode.setError("Enter Verification code..");
+                    binding.etCode.requestFocus();
+                }
+            }
+        });
+        mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+            @Override
+            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                signInWithPhoneAuthCredential(phoneAuthCredential);
+            }
+
+            @Override
+            public void onVerificationFailed(@NonNull FirebaseException e) {
+                showSnackbar(e.getMessage());
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onCodeSent(@NonNull String verificationId,
+                                   @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                mVerificationId = verificationId;
+                mResendToken = token;
+                binding.llOTP.setVisibility(View.VISIBLE);
+                binding.ccp.setEnabled(false);
+                binding.phoneNumber.setEnabled(false);
+                binding.btnContinue.setText("Verify Code");
+                showSnackbar("Code Sent to : " + phone);
+            }
+        };
+    }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        firebaseUser = task.getResult().getUser();
+
+                        StringRequest stringRequest = new StringRequest(
+                                Request.Method.POST,
+                                ServerConnector.LOGIN_URL,
+                                response -> {
+                                    if (response.equals("Success")){
+                                        startActivity(new Intent(getApplicationContext(), DashboardActivity.class));
+                                        finish();
+                                    } else {
+                                        startActivity(new Intent(LoginSignupActivity.this, SignUpActivity.class));
+                                        showSnackbar(phone + " is Verified..");
+                                        finish();
+                                    }
+                                }, error -> showSnackbar(error.getMessage())
+                        ) {
+                            @Override
+                            protected Map<String, String> getParams() {
+                                HashMap<String, String> hm = new HashMap<>();
+                                hm.put("key_phone", firebaseUser.getPhoneNumber());
+                                return hm;
+                            }
+                        };
+                        Volley.newRequestQueue(this).add(stringRequest);
+
+                    } else {
+                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            showSnackbar(task.getException().getMessage());
+                        }
+                    }
+                });
+    }
+
+    public boolean checkUtilsAreFillOrNot() {
+        if (TextUtils.isEmpty(binding.phoneNumber.getText()) || binding.phoneNumber.getText().toString().contains(" ")) {
+            binding.phoneNumber.setError("Field cannot be Empty..");
+            binding.phoneNumber.requestFocus();
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void startPhoneNumberVerification(String phone) {
+        showSnackbar("Sending Code to : " + phone);
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                phone,
+                60,
+                TimeUnit.SECONDS,
+                this,
+                mCallbacks
+        );
+    }
+
+    public void showSnackbar(String message) {
+        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+}

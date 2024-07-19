@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:id="@+id/llNoKeywordFound"
+    android:gravity="center"
+    android:background="@color/lightTheme">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:lottie_rawRes="@raw/search_not_found"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="true"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Not Found"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:fontFamily="@font/mulish_medium"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sorry, the keyword you entered cannot be \nfound, please check again or search with \nanother keyword."
+        android:textColor="#e5e5e5"
+        android:textSize="14sp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/mulish_medium"/>
+
+</LinearLayout>

@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.StreamBeat" parent="Base.Theme.StreamBeat" />
+
+    <style name="BottomSheetStyle" parent="Theme.Design.BottomSheetDialog">
+        <!-- Customize attributes as needed -->
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>

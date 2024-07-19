@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0E0E0E"
+    android:padding="16dp"
+    tools:context=".Activities.LoginSignupActivity">
+
+    <TextView
+        android:id="@+id/loginTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Log in or Sign up"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/mulish_medium"
+        android:lines="4"/>
+
+    <ScrollView
+        android:layout_below="@id/loginTxt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Country / Region"
+                android:layout_margin="5dp"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_medium"/>
+
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/ccp"
+                app:ccpDialog_showFastScroller="true"
+                app:ccpDialog_showCloseIcon="true"
+                app:ccp_useDummyEmojiForPreview="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ccpDialog_textColor="@color/white"
+                android:layout_margin="5dp"
+                android:height="44dp"
+                android:background="@drawable/edit_text_bg"
+                android:fontFamily="@font/mulish_medium"
+                android:minHeight="48dp"
+                app:ccp_textGravity="LEFT"
+                app:ccp_showFullName="true"
+                app:ccp_showNameCode="false"
+                app:ccpDialog_showFlag="false"
+                app:ccpDialog_showNameCode="false"
+                app:ccp_showFlag="false"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:ccpDialog_backgroundColor="@color/darkTheme"
+                app:ccp_autoDetectCountry="true"
+                app:ccp_showArrow="false"
+                app:ccp_contentColor="#CFCFCF"
+                app:ccp_textSize="16sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Phone number"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_medium"/>
+
+            <EditText
+                android:id="@+id/phoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:height="44dp"
+                android:maxLength="20"
+                android:background="@drawable/edit_text_bg"
+                android:fontFamily="@font/mulish_medium"
+                android:minHeight="48dp"
+                android:textColor="#CFCFCF"
+                android:textSize="16sp"
+                android:inputType="phone"
+                android:paddingStart="20dp"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="We’ll call or text you to confirm your number. \nStandard message and data rates apply."
+                android:textSize="12sp"
+                android:textColor="#CFCFCF"
+                android:fontFamily="@font/mulish_medium"/>
+
+            <LinearLayout
+                android:id="@+id/llOTP"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enter OTP Code sent to the given phone number"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_medium"/>
+
+                <EditText
+                    android:id="@+id/etCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="5dp"
+                    android:height="44dp"
+                    android:maxLength="20"
+                    android:background="@drawable/edit_text_bg"
+                    android:fontFamily="@font/mulish_medium"
+                    android:gravity="center"
+                    android:minHeight="48dp"
+                    android:textColor="#CFCFCF"
+                    android:textSize="16sp"
+                    android:textColorHint="#CFCFCF"
+                    android:inputType="number"
+                    android:hint="Enter Code"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnContinue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginTop="30dp"
+                android:text="Continue"
+                android:textSize="15sp"
+                android:fontFamily="@font/quicksand_medium" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

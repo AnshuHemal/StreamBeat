@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1034234259542",
+    "project_id": "streambeat-e2d15",
+    "storage_bucket": "streambeat-e2d15.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034234259542:android:a7d9088ab2a337231473f7",
+        "android_client_info": {
+          "package_name": "com.white.streambeat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASVdTHxHzQo3za5sV8cL_tjfbqncD1h4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

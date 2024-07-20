@@ -15,7 +15,7 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<List<Artists>> artistList = new MutableLiveData<>();
     private final MutableLiveData<List<Object>> searchResults = new MutableLiveData<>();
 
-    public MutableLiveData<List<Tracks>> getAllTracksList() {
+/*    public MutableLiveData<List<Tracks>> getAllTracksList() {
         return allTracksList;
     }
 
@@ -29,7 +29,7 @@ public class SharedViewModel extends ViewModel {
 
     public MutableLiveData<List<Artists>> getArtistList() {
         return artistList;
-    }
+    }*/
 
     public LiveData<List<Tracks>> getTracksForAlbum(String albumTitle) {
         MutableLiveData<List<Tracks>> filteredTracks = new MutableLiveData<>();
@@ -105,4 +105,5 @@ public class SharedViewModel extends ViewModel {
     public void clearSearchResults() {
         searchResults.setValue(new ArrayList<>());
     }
+
 }

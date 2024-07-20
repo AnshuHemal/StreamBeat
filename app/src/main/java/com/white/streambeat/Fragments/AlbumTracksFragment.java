@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Models.SharedViewModel;
+import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
 public class AlbumTracksFragment extends Fragment {

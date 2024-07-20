@@ -23,7 +23,6 @@ public class AlbumTracksFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TracksAdapter tracksAdapter;
-
     SharedViewModel sharedViewModel;
 
     @Override

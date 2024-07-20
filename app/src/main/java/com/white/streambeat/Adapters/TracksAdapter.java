@@ -56,6 +56,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView trackName, trackArtists;
         ImageView trackImage;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 

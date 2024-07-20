@@ -45,6 +45,8 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.media:media:1.7.0")
     implementation("com.airbnb.android:lottie:6.4.1")
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation("androidx.palette:palette:1.0.0")
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

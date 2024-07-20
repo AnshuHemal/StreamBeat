@@ -1,7 +1,10 @@
 package com.white.streambeat.Activities;
 
 import android.os.Bundle;
+
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -20,6 +23,8 @@ public class DashboardActivity extends AppCompatActivity {
     ActivityDashboardBinding binding;
     FrameLayout frameLayout;
     Fragment currentFragment;
+    ImageView trackImage, btnPlayPause;
+    TextView trackName, artistsName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +32,12 @@ public class DashboardActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         getSupportActionBar().hide();
+
+        trackImage = findViewById(R.id.trackMPImage);
+        btnPlayPause = findViewById(R.id.btnPlayPause);
+        trackName = findViewById(R.id.trackMPName);
+        artistsName = findViewById(R.id.trackMPArtistName);
 
         frameLayout = findViewById(R.id.frameLayout);
         currentFragment = new HomeFragment();

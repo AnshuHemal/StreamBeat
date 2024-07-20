@@ -24,6 +24,7 @@ public class AlbumTracksFragment extends Fragment {
     private RecyclerView recyclerView;
     private TracksAdapter tracksAdapter;
     SharedViewModel sharedViewModel;
+    String albumTitle;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,7 +39,7 @@ public class AlbumTracksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         assert getArguments() != null;
-        String albumTitle = getArguments().getString("album_title", "");
+        albumTitle = getArguments().getString("album_title", "");
         txtAlbumTitle.setText(albumTitle);
         observeTracksForAlbum(albumTitle);
 

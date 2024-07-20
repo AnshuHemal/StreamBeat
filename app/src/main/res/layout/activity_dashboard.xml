@@ -9,11 +9,10 @@
     tools:context=".Activities.DashboardActivity">
 
     <FrameLayout
+        android:paddingBottom="15dp"
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        tools:ignore="SpeakableTextPresentCheck" />
+        android:layout_height="match_parent"/>
 
     <include
         android:id="@+id/track_mini_player_bar"

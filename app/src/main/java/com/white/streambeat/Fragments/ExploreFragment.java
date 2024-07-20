@@ -3,6 +3,7 @@ package com.white.streambeat.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +38,7 @@ public class ExploreFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
 
+        FragmentManager fragmentManager = getParentFragmentManager();
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         recyclerViewSearchResults = view.findViewById(R.id.recyclerViewSearchResults);
         recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -47,7 +49,7 @@ public class ExploreFragment extends Fragment {
 
         searchView = view.findViewById(R.id.searchView);
         searchResults = new ArrayList<>();
-        searchAdapter = new SearchAdapter(getContext(), searchResults);
+        searchAdapter = new SearchAdapter(getContext(), fragmentManager, searchResults);
         recyclerViewSearchResults.setAdapter(searchAdapter);
 
 
@@ -76,15 +78,15 @@ public class ExploreFragment extends Fragment {
                 Log.d("ExploreFragment", "Search results updated: " + searchResults.size() + " items");
 
                 if (searchResults.isEmpty()) {
-                    no_keyword_found.setVisibility(View.VISIBLE);
+                    no_keyword_found.setVisibility(View.GONE);
                     recyclerViewSearchResults.setVisibility(View.GONE);
                 } else {
                     recyclerViewSearchResults.setVisibility(View.VISIBLE);
                     no_keyword_found.setVisibility(View.GONE);
                 }
             } else {
-                no_keyword_found.setVisibility(View.VISIBLE);
-                recyclerViewSearchResults.setVisibility(View.GONE);
+                no_keyword_found.setVisibility(View.GONE);
+                recyclerViewSearchResults.setVisibility(View.INVISIBLE);
             }
         });
 

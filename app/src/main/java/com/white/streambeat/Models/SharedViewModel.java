@@ -31,6 +31,22 @@ public class SharedViewModel extends ViewModel {
         return artistList;
     }
 
+    public LiveData<List<Tracks>> getTracksForAlbum(String albumTitle) {
+        MutableLiveData<List<Tracks>> filteredTracks = new MutableLiveData<>();
+        List<Tracks> allTracks = allTracksList.getValue();
+
+        if (allTracks != null) {
+            List<Tracks> tracksForAlbum = allTracks.stream()
+                    .filter(track -> track.getAlbum_title().equals(albumTitle))
+                    .collect(Collectors.toList());
+            filteredTracks.setValue(tracksForAlbum);
+        } else {
+            filteredTracks.setValue(new ArrayList<>());
+        }
+
+        return filteredTracks;
+    }
+
     public LiveData<List<Object>> getSearchResults() {
         return searchResults;
     }

@@ -2,6 +2,7 @@ package com.white.streambeat.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.Tracks;
@@ -27,10 +30,12 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int TYPE_TRACK = 3;
 
     private final Context context;
-    private final List<Object> searchResults;
+    List<Object> searchResults;
+    FragmentManager fragmentManager;
 
-    public SearchAdapter(Context context, List<Object> searchResults) {
+    public SearchAdapter(Context context, FragmentManager fragmentManager, List<Object> searchResults) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.searchResults = searchResults;
     }
 
@@ -106,10 +111,15 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.albumName.setText(album.getAlbum_title());
         Picasso.get().load(album.getCover_image_url()).into(holder.albumCover);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Album", Toast.LENGTH_SHORT).show();
+        holder.itemView.setOnClickListener(v -> {
+            Toast.makeText(context, "Album", Toast.LENGTH_SHORT).show();
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                Object item = searchResults.get(adapterPosition);
+                if (item instanceof Albums) {
+                    Albums album1 = (Albums) item;
+                    navigateToAlbumTracksFragment(fragmentManager, album1.getAlbum_title());
+                }
             }
         });
     }
@@ -157,7 +167,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class AlbumViewHolder extends RecyclerView.ViewHolder {
+    public class AlbumViewHolder extends RecyclerView.ViewHolder {
         TextView albumName;
         ImageView albumCover;
 
@@ -176,6 +186,20 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             artistName = itemView.findViewById(R.id.artistSearchName);
             artistImage = itemView.findViewById(R.id.artistSearchImage);
+        }
+    }
+
+    public void navigateToAlbumTracksFragment(FragmentManager fragmentManager, String album_title) {
+        Bundle bundle = new Bundle();
+        bundle.putString("album_title", album_title);
+
+        AlbumTracksFragment albumTracksFragment = new AlbumTracksFragment();
+        albumTracksFragment.setArguments(bundle);
+
+        if (fragmentManager != null && !fragmentManager.isDestroyed()) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.frameLayout, albumTracksFragment)
+                    .commit();
         }
     }
 }

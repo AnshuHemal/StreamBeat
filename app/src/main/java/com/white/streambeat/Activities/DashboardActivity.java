@@ -28,6 +28,8 @@ public class DashboardActivity extends AppCompatActivity {
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        getSupportActionBar().hide();
+
         frameLayout = findViewById(R.id.frameLayout);
         currentFragment = new HomeFragment();
         loadFragment(currentFragment, false);

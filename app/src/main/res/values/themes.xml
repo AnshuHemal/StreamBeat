@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.StreamBeat" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.StreamBeat" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+         <item name="colorPrimary">@color/primaryColor</item>
+        <item name="android:statusBarColor">@color/lightTheme</item>
     </style>
 
     <style name="Theme.StreamBeat" parent="Base.Theme.StreamBeat" />
@@ -10,5 +11,10 @@
     <style name="BottomSheetStyle" parent="Theme.Design.BottomSheetDialog">
         <!-- Customize attributes as needed -->
         <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="BottomNavigationText" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/mulish_medium</item>
+        <item name="android:textSize">12sp</item> <!-- Adjust the text size here -->
     </style>
 </resources>

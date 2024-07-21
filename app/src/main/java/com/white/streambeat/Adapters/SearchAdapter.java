@@ -15,12 +15,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -82,12 +84,12 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 configureArtistViewHolder((ArtistViewHolder) holder, (Artists) item);
                 break;
             case TYPE_TRACK:
-                configureTrackViewHolder((TrackViewHolder) holder, (Tracks) item);
+                configureTrackViewHolder((TrackViewHolder) holder, (Tracks) item, position);
                 break;
         }
     }
 
-    private void configureTrackViewHolder(TrackViewHolder holder, Tracks track) {
+    private void configureTrackViewHolder(TrackViewHolder holder, Tracks track, int position) {
         holder.trackName.setText(track.getTrack_name());
 
         StringBuilder artistsBuilder = new StringBuilder();
@@ -102,7 +104,14 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Song", Toast.LENGTH_SHORT).show();
+                Object item = searchResults.get(position);
+                if (item instanceof Tracks) {
+                    Tracks clickedTrack = (Tracks) item;
+                    ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
+                } else {
+                    // Handle the case where the clicked item is not of type Tracks
+                    Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

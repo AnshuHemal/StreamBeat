@@ -1,5 +1,11 @@
 package com.white.streambeat.Activities;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -48,6 +54,25 @@ public class DashboardActivity extends AppCompatActivity {
     private Runnable updateProgressRunnable;
     private List<Tracks> tracksList;
     private int currentTrackPosition = -1;
+    String bluetoothDevice = "";
+
+    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action != null && action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device != null) {
+                    // Device connected, show toast with device name
+                    bluetoothDevice = device.getName();
+                    if (bluetoothDevice != null) {
+                        Toast.makeText(context, "Bluetooth connected with " + bluetoothDevice, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +113,9 @@ public class DashboardActivity extends AppCompatActivity {
             loadFragment(fragment, false);
             return true;
         });
+
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        registerReceiver(bluetoothReceiver, filter);
 
     }
     private void loadFragment(Fragment fragment, boolean addToBackStack) {
@@ -204,7 +232,7 @@ public class DashboardActivity extends AppCompatActivity {
         if (tracksList != null && !tracksList.isEmpty()) {
             currentTrackPosition++;
             if (currentTrackPosition >= tracksList.size()) {
-                currentTrackPosition = 0; // Loop back to the first track
+                currentTrackPosition = 0;
             }
             playCurrentTrack();
             showMiniPlayer(tracksList.get(currentTrackPosition));

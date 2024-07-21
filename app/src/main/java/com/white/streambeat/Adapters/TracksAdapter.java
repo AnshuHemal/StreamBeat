@@ -1,7 +1,6 @@
 package com.white.streambeat.Adapters;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,31 +8,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder> {
 
     Context context;
     List<Tracks> tracksList;
+    private int currentlyPlayingPosition = -1;
 
-    public interface OnTrackClickListener {
-        void onTrackClick(int position);
-    }
-    private OnTrackClickListener listener;
-
-    public void setOnTrackClickListener(OnTrackClickListener listener) {
-        this.listener = listener;
-    }
-
-    public TracksAdapter(Context context, List<Tracks> tracksList) {
+    public TracksAdapter(Context context) {
         this.context = context;
+        this.tracksList = new ArrayList<>();
+    }
+
+    public void setTracksList(List<Tracks> tracksList) {
         this.tracksList = tracksList;
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentlyPlayingPosition(int position) {
+        this.currentlyPlayingPosition = position;
+        notifyDataSetChanged(); // Notify adapter to update UI
     }
 
     @NonNull
@@ -48,7 +52,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         holder.trackName.setText(tracksList.get(position).getTrack_name());
 
         StringBuilder artistsBuilder = new StringBuilder();
-        for (int i=0; i < tracksList.get(position).getArtist_names().size(); i++) {
+        for (int i = 0; i < tracksList.get(position).getArtist_names().size(); i++) {
             artistsBuilder.append(tracksList.get(position).getArtist_names().get(i));
             if (i < tracksList.get(position).getArtist_names().size() - 1) {
                 artistsBuilder.append(", ");
@@ -57,9 +61,16 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         holder.trackArtists.setText(artistsBuilder.toString());
         Picasso.get().load(tracksList.get(position).getTrack_image_url()).into(holder.trackImage);
 
+        if (position == currentlyPlayingPosition) {
+            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightGreen));
+        } else {
+            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
+        }
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onTrackClick(position);
+            if (position != currentlyPlayingPosition) {
+                ((DashboardActivity) context).playTracks(tracksList, position);
+                setCurrentlyPlayingPosition(position);
             }
         });
     }

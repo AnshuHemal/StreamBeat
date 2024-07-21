@@ -101,6 +101,11 @@ public class ExploreFragment extends Fragment {
             sharedViewModel.search(query);
             Log.d("ExploreFragment", "Performing search with query: " + query);
         }
+    }
 
+    public void updateCurrentlyPlayingPosition(int position) {
+        if (searchAdapter != null) {
+            searchAdapter.setCurrentlyPlayingPosition(position);
+        }
     }
 }

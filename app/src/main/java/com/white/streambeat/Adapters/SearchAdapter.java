@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +35,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private final Context context;
     List<Object> searchResults;
     FragmentManager fragmentManager;
+    private int currentlyPlayingPosition = -1;
 
     public SearchAdapter(Context context, FragmentManager fragmentManager, List<Object> searchResults) {
         this.context = context;
@@ -46,6 +48,11 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         searchResults.clear();
         searchResults.addAll(newSearchResults);
         notifyDataSetChanged();
+    }
+
+    public void setCurrentlyPlayingPosition(int position) {
+        this.currentlyPlayingPosition = position;
+        notifyDataSetChanged(); // Notify adapter to update UI
     }
 
     @NonNull
@@ -101,16 +108,26 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
         holder.trackArtists.setText(artistsBuilder.toString());
         Picasso.get().load(track.getTrack_image_url()).into(holder.trackImage);
+
+        if (position == currentlyPlayingPosition) {
+            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightGreen));
+        } else {
+            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Object item = searchResults.get(position);
-                if (item instanceof Tracks) {
-                    Tracks clickedTrack = (Tracks) item;
-                    ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
-                } else {
-                    // Handle the case where the clicked item is not of type Tracks
-                    Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
+                if (position != currentlyPlayingPosition) {
+                    if (item instanceof Tracks) {
+                        Tracks clickedTrack = (Tracks) item;
+                        ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
+                        setCurrentlyPlayingPosition(position);
+                    } else {
+                        // Handle the case where the clicked item is not of type Tracks
+                        Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });

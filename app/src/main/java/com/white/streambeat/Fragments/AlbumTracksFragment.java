@@ -24,13 +24,12 @@ import com.white.streambeat.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumTracksFragment extends Fragment implements TracksAdapter.OnTrackClickListener {
+public class AlbumTracksFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TracksAdapter tracksAdapter;
     SharedViewModel sharedViewModel;
     String albumTitle;
-    List<Tracks> tracksList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,11 +42,8 @@ public class AlbumTracksFragment extends Fragment implements TracksAdapter.OnTra
         TextView txtAlbumTitle = view.findViewById(R.id.txtAlbumTitle);
         recyclerView = view.findViewById(R.id.albumTracksRV);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        tracksAdapter = new TracksAdapter(getContext(), tracksList);
+        tracksAdapter = new TracksAdapter(getContext());
         recyclerView.setAdapter(tracksAdapter);
-        if (tracksAdapter != null) {
-            tracksAdapter.setOnTrackClickListener(this);
-        }
 
         assert getArguments() != null;
         albumTitle = getArguments().getString("album_title", "");
@@ -81,18 +77,15 @@ public class AlbumTracksFragment extends Fragment implements TracksAdapter.OnTra
     private void observeTracksForAlbum(String albumTitle) {
         sharedViewModel.getTracksForAlbum(albumTitle).observe(getViewLifecycleOwner(), tracks -> {
             if (tracks != null) {
-                tracksList.addAll(tracks);
-                tracksAdapter = new TracksAdapter(getContext(), tracksList);
+                tracksAdapter = new TracksAdapter(getContext());
+                tracksAdapter.setTracksList(tracks);
                 recyclerView.setAdapter(tracksAdapter);
-                tracksAdapter.setOnTrackClickListener(this);
             }
         });
     }
-
-    @Override
-    public void onTrackClick(int position) {
-        if (getActivity() instanceof DashboardActivity) {
-            ((DashboardActivity) getActivity()).playTracks(tracksList, position);
+    public void updateCurrentlyPlayingPosition(int position) {
+        if (tracksAdapter != null) {
+            tracksAdapter.setCurrentlyPlayingPosition(position);
         }
     }
 }

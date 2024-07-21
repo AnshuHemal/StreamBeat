@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Fragments.ExploreFragment;
 import com.white.streambeat.Fragments.HomeFragment;
 import com.white.streambeat.Fragments.LibraryFragment;
@@ -116,8 +117,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         registerReceiver(bluetoothReceiver, filter);
-
     }
+
     private void loadFragment(Fragment fragment, boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -189,7 +190,7 @@ public class DashboardActivity extends AppCompatActivity {
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
         StringBuilder artistsBuilder = new StringBuilder();
-        for (int i=0; i < tracks.getArtist_names().size(); i++) {
+        for (int i = 0; i < tracks.getArtist_names().size(); i++) {
             artistsBuilder.append(tracks.getArtist_names().get(i));
             if (i < tracks.getArtist_names().size() - 1) {
                 artistsBuilder.append(", ");
@@ -234,8 +235,24 @@ public class DashboardActivity extends AppCompatActivity {
             if (currentTrackPosition >= tracksList.size()) {
                 currentTrackPosition = 0;
             }
+            updateAlbumTracksAdapter();
+            updateSearchAdapter();
             playCurrentTrack();
             showMiniPlayer(tracksList.get(currentTrackPosition));
+        }
+    }
+
+    private void updateAlbumTracksAdapter() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragment instanceof AlbumTracksFragment) {
+            ((AlbumTracksFragment) fragment).updateCurrentlyPlayingPosition(currentTrackPosition);
+        }
+    }
+
+    private void updateSearchAdapter() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        if (fragment instanceof ExploreFragment) {
+            ((ExploreFragment) fragment).updateCurrentlyPlayingPosition(currentTrackPosition);
         }
     }
 

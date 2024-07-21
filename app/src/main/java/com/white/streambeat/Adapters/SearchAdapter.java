@@ -112,7 +112,6 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         Picasso.get().load(album.getCover_image_url()).into(holder.albumCover);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(context, "Album", Toast.LENGTH_SHORT).show();
             int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 Object item = searchResults.get(adapterPosition);

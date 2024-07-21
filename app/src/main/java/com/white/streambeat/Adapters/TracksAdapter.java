@@ -1,6 +1,7 @@
 package com.white.streambeat.Adapters;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,15 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
 
     Context context;
     List<Tracks> tracksList;
+
+    public interface OnTrackClickListener {
+        void onTrackClick(int position);
+    }
+    private OnTrackClickListener listener;
+
+    public void setOnTrackClickListener(OnTrackClickListener listener) {
+        this.listener = listener;
+    }
 
     public TracksAdapter(Context context, List<Tracks> tracksList) {
         this.context = context;
@@ -46,6 +56,12 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         }
         holder.trackArtists.setText(artistsBuilder.toString());
         Picasso.get().load(tracksList.get(position).getTrack_image_url()).into(holder.trackImage);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTrackClick(position);
+            }
+        });
     }
 
     @Override

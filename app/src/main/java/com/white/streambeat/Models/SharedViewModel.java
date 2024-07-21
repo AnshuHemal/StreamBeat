@@ -15,6 +15,32 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<List<Artists>> artistList = new MutableLiveData<>();
     private final MutableLiveData<List<Object>> searchResults = new MutableLiveData<>();
 
+    private MutableLiveData<Tracks> currentlyPlayingTrack = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>(false);
+
+    public void setCurrentlyPlayingTrack(Tracks track) {
+        currentlyPlayingTrack.setValue(track);
+    }
+
+    public LiveData<Tracks> getCurrentlyPlayingTrack() {
+        return currentlyPlayingTrack;
+    }
+
+    public void setIsPlaying(boolean playing) {
+        isPlaying.setValue(playing);
+    }
+
+    public LiveData<Boolean> getIsPlaying() {
+        return isPlaying;
+    }
+
+    public void togglePlayback() {
+        Boolean currentPlayingState = isPlaying.getValue();
+        if (currentPlayingState != null) {
+            isPlaying.setValue(!currentPlayingState);
+        }
+    }
+
 /*    public MutableLiveData<List<Tracks>> getAllTracksList() {
         return allTracksList;
     }

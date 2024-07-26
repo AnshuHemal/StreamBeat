@@ -1,5 +1,6 @@
 package com.white.streambeat.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Models.Tracks;
@@ -24,20 +27,23 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     Context context;
     List<Tracks> tracksList;
     private int currentlyPlayingPosition = -1;
+    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     public TracksAdapter(Context context) {
         this.context = context;
         this.tracksList = new ArrayList<>();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setTracksList(List<Tracks> tracksList) {
         this.tracksList = tracksList;
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setCurrentlyPlayingPosition(int position) {
         this.currentlyPlayingPosition = position;
-        notifyDataSetChanged(); // Notify adapter to update UI
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -47,6 +53,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         return new ViewHolder(view);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull TracksAdapter.ViewHolder holder, int position) {
         holder.trackName.setText(tracksList.get(position).getTrack_name());
@@ -61,6 +68,14 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         holder.trackArtists.setText(artistsBuilder.toString());
         Picasso.get().load(tracksList.get(position).getTrack_image_url()).into(holder.trackImage);
 
+        if (tracksList.get(position).isLikedByUser()) {
+            holder.trackLikeBtn.setImageResource(R.drawable.added);
+            holder.trackLikeBtn.setColorFilter(ContextCompat.getColor(context, R.color.lightGreen));
+        } else {
+            holder.trackLikeBtn.setImageResource(R.drawable.add_to_liked_songs);
+            holder.trackLikeBtn.setColorFilter(ContextCompat.getColor(context, R.color.lightWhite));
+        }
+
         if (position == currentlyPlayingPosition) {
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightGreen));
         } else {
@@ -73,6 +88,11 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
                 setCurrentlyPlayingPosition(position);
             }
         });
+
+        holder.trackLikeBtn.setOnClickListener(v -> {
+            ((DashboardActivity) context).onLikeButtonClick(tracksList.get(position), firebaseUser.getPhoneNumber());
+            notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -82,7 +102,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView trackName, trackArtists;
-        ImageView trackImage;
+        ImageView trackImage, trackLikeBtn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +110,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
             trackName = itemView.findViewById(R.id.trackSearchName);
             trackArtists = itemView.findViewById(R.id.trackSearchArtistsName);
             trackImage = itemView.findViewById(R.id.trackSearchImage);
+            trackLikeBtn = itemView.findViewById(R.id.btnLike);
         }
     }
 }

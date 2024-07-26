@@ -26,10 +26,16 @@
             android:textSize="14sp"
             android:id="@+id/txtError"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/artistsRV"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/artistsRV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

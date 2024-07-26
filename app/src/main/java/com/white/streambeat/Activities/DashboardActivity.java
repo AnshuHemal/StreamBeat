@@ -22,7 +22,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Fragments.ExploreFragment;
 import com.white.streambeat.Fragments.HomeFragment;
@@ -34,7 +41,10 @@ import com.white.streambeat.R;
 import com.white.streambeat.databinding.ActivityDashboardBinding;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -42,10 +52,11 @@ public class DashboardActivity extends AppCompatActivity {
     FrameLayout frameLayout;
     Fragment currentFragment;
     SharedViewModel sharedViewModel;
+    FirebaseUser firebaseUser;
 
     View miniPlayerView;
     TextView miniPlayerTitle, miniPlayerArtistsNames;
-    ImageView miniPlayerPlayPause, miniPlayerShuffle;
+    ImageView miniPlayerPlayPause, miniPlayerShuffle, miniPlayerImage;
 
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
@@ -57,6 +68,23 @@ public class DashboardActivity extends AppCompatActivity {
     private int currentTrackPosition = -1;
     String bluetoothDevice = "";
 
+    public void onLikeButtonClick(Tracks track, String phoneNumber) {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.STORE_LIKED_TRACKS,
+                response -> Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show(), error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("user_phone", phoneNumber);
+                map.put("track_name", track.getTrack_name());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
+    }
+
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         @Override
@@ -65,7 +93,6 @@ public class DashboardActivity extends AppCompatActivity {
             if (action != null && action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device != null) {
-                    // Device connected, show toast with device name
                     bluetoothDevice = device.getName();
                     if (bluetoothDevice != null) {
                         Toast.makeText(context, "Bluetooth connected with " + bluetoothDevice, Toast.LENGTH_SHORT).show();
@@ -81,15 +108,17 @@ public class DashboardActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         miniPlayerView = findViewById(R.id.track_mini_player_bar);
         miniPlayerTitle = findViewById(R.id.trackMPName);
         miniPlayerArtistsNames = findViewById(R.id.trackMPArtistName);
         miniPlayerPlayPause = findViewById(R.id.btnPlayPause);
         miniPlayerShuffle = findViewById(R.id.shuffle);
+        miniPlayerImage = findViewById(R.id.trackMPImage);
         trackProgressIndicator = findViewById(R.id.trackProgressIndicator);
 
         miniPlayerView.setVisibility(View.GONE);
@@ -110,6 +139,7 @@ public class DashboardActivity extends AppCompatActivity {
             } else {
                 fragment = new ProfileFragment();
             }
+
             currentFragment = fragment;
             loadFragment(fragment, false);
             return true;
@@ -179,7 +209,7 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             try {
-                mediaPlayer.setDataSource("https://onlinetestcase.com/wp-content/uploads/2023/06/500-KB-MP3.mp3");
+                mediaPlayer.setDataSource(currentTrack.getFile_url());
                 mediaPlayer.prepareAsync();
             } catch (IOException e) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -189,6 +219,9 @@ public class DashboardActivity extends AppCompatActivity {
 
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
+
+        Picasso.get().load("https://i.scdn.co/image/ab67706f0000000285c716247c24f66ef40f011e").into(miniPlayerImage);
+
         StringBuilder artistsBuilder = new StringBuilder();
         for (int i = 0; i < tracks.getArtist_names().size(); i++) {
             artistsBuilder.append(tracks.getArtist_names().get(i));
@@ -203,7 +236,7 @@ public class DashboardActivity extends AppCompatActivity {
         miniPlayerShuffle.setOnClickListener(v -> playNextTrack());
     }
 
-    private void togglePlayback() {
+    public void togglePlayback() {
         if (mediaPlayer.isPlaying()) {
             pauseTrack();
         } else {
@@ -229,7 +262,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void playNextTrack() {
+    public void playNextTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
             currentTrackPosition++;
             if (currentTrackPosition >= tracksList.size()) {

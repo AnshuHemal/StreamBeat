@@ -14,6 +14,24 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<List<Tracks>> allTracksList = new MutableLiveData<>();
     private final MutableLiveData<List<Artists>> artistList = new MutableLiveData<>();
     private final MutableLiveData<List<Object>> searchResults = new MutableLiveData<>();
+    private final MutableLiveData<List<Artists>> favoriteArtistsList = new MutableLiveData<>();
+    private final MutableLiveData<List<Artists>> filteredArtistsList = new MutableLiveData<>();
+
+    public MutableLiveData<List<Artists>> getFavoriteArtistsList() {
+        return favoriteArtistsList;
+    }
+
+    public MutableLiveData<List<Artists>> getFilteredArtistsList() {
+        return filteredArtistsList;
+    }
+
+    public void setFavoriteArtistsList(List<Artists> artists) {
+        favoriteArtistsList.setValue(artists);
+    }
+
+    public void setFilteredArtistsList(List<Artists> artists) {
+        filteredArtistsList.setValue(artists);
+    }
 
     public LiveData<List<Tracks>> getTracksForAlbum(String albumTitle) {
         MutableLiveData<List<Tracks>> filteredTracks = new MutableLiveData<>();
@@ -39,12 +57,28 @@ public class SharedViewModel extends ViewModel {
         allArtistsList.setValue(artists);
     }
 
+    public MutableLiveData<List<Artists>> getAllArtistsList() {
+        return allArtistsList;
+    }
+
     public void setAllAlbumsList(List<Albums> albums) {
         allAlbumsList.setValue(albums);
     }
 
     public void setAllTracksList(List<Tracks> tracks) {
         allTracksList.setValue(tracks);
+    }
+
+    public MutableLiveData<List<Tracks>> getAllTracksList() {
+        return allTracksList;
+    }
+
+    public MutableLiveData<List<Artists>> getArtistList() {
+        return artistList;
+    }
+
+    public void setArtistList(List<Artists> artists) {
+        artistList.setValue(artists);
     }
 
     public void search(String query) {

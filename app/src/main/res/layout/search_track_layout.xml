@@ -83,6 +83,13 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/btnLike"
+            android:layout_marginEnd="10dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:tint="@color/white"/>
+
+        <ImageView
             android:id="@+id/btnPlayPause"
             android:layout_width="20dp"
             android:layout_height="20dp"

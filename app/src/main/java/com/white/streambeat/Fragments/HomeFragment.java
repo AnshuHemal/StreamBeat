@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +20,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.white.streambeat.Adapters.FavArtistsAdapter;
+import com.white.streambeat.Adapters.PopularAlbumsAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
@@ -30,6 +38,7 @@ import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -42,16 +51,22 @@ public class HomeFragment extends Fragment {
 
     TextView greetingTxt, unameTxt;
     FirebaseUser firebaseUser;
+    RecyclerView recyclerViewFavArtists, recyclerViewPopularAlbums;
 
+    List<Artists> artists = new ArrayList<>();
+    List<Albums> popularAlbums = new ArrayList<>();
     List<Artists> allArtists = new ArrayList<>();
     List<Albums> allAlbums = new ArrayList<>();
     List<Tracks> allTracks = new ArrayList<>();
+
+    FavArtistsAdapter favArtistsAdapter;
+    PopularAlbumsAdapter albumsAdapter;
 
     private SharedViewModel sharedViewModel;
 
     private static final String PREF_NAME = "MyPrefs";
     private static final String PREF_DATA_FETCHED = "data_fetched";
-    private SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,16 +78,87 @@ public class HomeFragment extends Fragment {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         greetingTxt = view.findViewById(R.id.txtGreeting);
         unameTxt = view.findViewById(R.id.txtUsername);
+        recyclerViewFavArtists = view.findViewById(R.id.recyclerViewFavoriteArtists);
+        recyclerViewPopularAlbums = view.findViewById(R.id.recyclerViewPopularAlbums);
 
         showGreetingMsg();
 
-        sharedPreferences = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        if (isAdded()) {
+            sharedPreferences = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
         fetchAllArtists();
         fetchAllAlbums();
         fetchAllTracks();
+        fetchPopularAlbums();
         fetchUserInfo();
 
+        recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        artists = new ArrayList<>();
+        favArtistsAdapter = new FavArtistsAdapter(getContext(), artists);
+        recyclerViewFavArtists.setAdapter(favArtistsAdapter);
+
+        recyclerViewPopularAlbums.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        popularAlbums = new ArrayList<>();
+        albumsAdapter = new PopularAlbumsAdapter(getContext(), popularAlbums, getParentFragmentManager());
+        recyclerViewPopularAlbums.setAdapter(albumsAdapter);
+
+        boolean dataFetched = sharedPreferences.getBoolean(PREF_DATA_FETCHED, false);
+        if (!dataFetched) {
+            fetchUserInfo();
+            fetchFavoriteArtists();
+            fetchPopularAlbums();
+//            fetchBestsOfArtistsAlbums();
+        } else {
+            restoreDataFromSharedPreferences();
+        }
+
         return view;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void restoreDataFromSharedPreferences() {
+        String artistsJson = sharedPreferences.getString("artists_list", "");
+        String albumsJson = sharedPreferences.getString("popular_albums_list", "");
+        if (!artistsJson.isEmpty()) {
+            try {
+                JSONArray artistsArray = new JSONArray(artistsJson);
+                artists.clear();
+                for (int i = 0; i < artistsArray.length(); i++) {
+                    JSONObject artistObj = artistsArray.getJSONObject(i);
+                    int artist_id = artistObj.getInt("artist_id");
+                    String artistName = artistObj.getString("artist_name");
+                    String image_url = artistObj.getString("image_url");
+                    artists.add(new Artists(artist_id, artistName, image_url));
+                }
+                favArtistsAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error restoring favorite artists: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!albumsJson.isEmpty()) {
+            try {
+                JSONArray artistsArray = new JSONArray(albumsJson);
+                popularAlbums.clear();
+                for (int i = 0; i < artistsArray.length(); i++) {
+                    JSONObject artistObj = artistsArray.getJSONObject(i);
+                    int artist_id = artistObj.getInt("album_id");
+                    String artistName = artistObj.getString("album_title");
+                    String image_url = artistObj.getString("cover_image_url");
+                    popularAlbums.add(new Albums(artist_id, artistName, image_url));
+                }
+                albumsAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void saveUserInfoToSharedPreferences(String fullName) {
+        sharedPreferences.edit()
+                .putBoolean(PREF_DATA_FETCHED, true)
+                .putString("user_name", fullName)
+                .apply();
     }
 
     public void showGreetingMsg() {
@@ -103,6 +189,7 @@ public class HomeFragment extends Fragment {
                             String lname = j1.optString("lname");
                             unameTxt.setText(fname + " " + lname);
                         }
+                        saveUserInfoToSharedPreferences(unameTxt.getText().toString());
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -127,21 +214,24 @@ public class HomeFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_artists");
                         allArtists.clear();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject artistObj = jsonArray.getJSONObject(i);
-                            int artistId = artistObj.getInt("artist_id");
-                            String artistName = artistObj.getString("artist_name");
-                            String imageUrl = artistObj.getString("image_url");
-                            Artists artists = new Artists(artistId, artistName, imageUrl);
-                            allArtists.add(artists);
+                        if (isAdded()) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
+                                int artistId = artistObj.getInt("artist_id");
+                                String artistName = artistObj.getString("artist_name");
+                                String imageUrlBase64 = artistObj.getString("image_url");
+
+                                Artists artists = new Artists(artistId, artistName, imageUrlBase64);
+                                allArtists.add(artists);
+                            }
+                            saveArtistsDetailsToSharedPreferences();
+                            sharedViewModel.setAllArtistsList(allArtists);
                         }
-                        saveArtistsDetailsToSharedPreferences();
-                        sharedViewModel.setAllArtistsList(allArtists);
 
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> Toast.makeText(requireContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
         );
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
@@ -155,16 +245,19 @@ public class HomeFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_albums");
                         allAlbums.clear();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject albumObj = jsonArray.getJSONObject(i);
-                            int album_id = albumObj.getInt("album_id");
-                            String album_title = albumObj.getString("album_title");
-                            String cover_image_url = albumObj.getString("cover_image_url");
-                            Albums albums = new Albums(album_id, album_title, cover_image_url);
-                            allAlbums.add(albums);
+                        if (isAdded()) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject albumObj = jsonArray.getJSONObject(i);
+                                int album_id = albumObj.getInt("album_id");
+                                String album_title = albumObj.getString("album_title");
+//                                String cover_image_url = albumObj.getString("cover_image_url");
+                                String cover_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
+                                Albums albums = new Albums(album_id, album_title, cover_image_url);
+                                allAlbums.add(albums);
+                            }
+                            saveAlbumsDetailsToSharedPreferences();
+                            sharedViewModel.setAllAlbumsList(allAlbums);
                         }
-                        saveAlbumsDetailsToSharedPreferences();
-                        sharedViewModel.setAllAlbumsList(allAlbums);
 
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -184,37 +277,39 @@ public class HomeFragment extends Fragment {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_tracks");
                         allTracks.clear();
+                        if (isAdded()) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject trackObj = jsonArray.getJSONObject(i);
+                                int track_id = trackObj.getInt("track_id");
+                                String track_name = trackObj.getString("track_name");
+                                String file_url = trackObj.getString("file_url");
+//                                String track_image_url = trackObj.getString("track_image_url");
+                                String track_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
+                                String albumTitle = trackObj.getString("album_title");
 
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject trackObj = jsonArray.getJSONObject(i);
-                            int track_id = trackObj.getInt("track_id");
-                            String track_name = trackObj.getString("track_name");
-                            String file_url = trackObj.getString("file_url");
-                            String track_image_url = trackObj.getString("track_image_url");
-                            String albumTitle = trackObj.getString("album_title");
-
-                            Object artistNamesObj = trackObj.get("artist_names");
-                            List<String> artistNames = new ArrayList<>();
-                            if (artistNamesObj instanceof JSONArray) {
-                                JSONArray artistNamesArray = (JSONArray) artistNamesObj;
-                                for (int j = 0; j < artistNamesArray.length(); j++) {
-                                    artistNames.add(artistNamesArray.getString(j));
+                                Object artistNamesObj = trackObj.get("artist_names");
+                                List<String> artistNames = new ArrayList<>();
+                                if (artistNamesObj instanceof JSONArray) {
+                                    JSONArray artistNamesArray = (JSONArray) artistNamesObj;
+                                    for (int j = 0; j < artistNamesArray.length(); j++) {
+                                        artistNames.add(artistNamesArray.getString(j));
+                                    }
+                                } else if (artistNamesObj instanceof String) {
+                                    artistNames.add((String) artistNamesObj);
                                 }
-                            } else if (artistNamesObj instanceof String) {
-                                artistNames.add((String) artistNamesObj);
-                            }
-                            Tracks track = new Tracks(track_id, track_name, file_url, track_image_url, artistNames, albumTitle);
-                            allTracks.add(track);
+                                Tracks track = new Tracks(track_id, track_name, file_url, track_image_url, artistNames, albumTitle);
+                                allTracks.add(track);
 
-                            for (Albums album : allAlbums) {
-                                if (album.getAlbum_title().equals(albumTitle)) {
-                                    album.addTrack(track);
-                                    break;
+                                for (Albums album : allAlbums) {
+                                    if (album.getAlbum_title().equals(albumTitle)) {
+                                        album.addTrack(track);
+                                        break;
+                                    }
                                 }
                             }
+                            saveTracksDetailsToSharedPreferences();
+                            sharedViewModel.setAllTracksList(allTracks);
                         }
-                        saveTracksDetailsToSharedPreferences();
-                        sharedViewModel.setAllTracksList(allTracks);
 
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -222,6 +317,120 @@ public class HomeFragment extends Fragment {
                 }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
         );
         Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void fetchPopularAlbums() {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_POPULAR_ALBUMS,
+                new Response.Listener<String>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            popularAlbums.clear();
+                            JSONObject j = new JSONObject(response);
+                            JSONArray jsonArray = j.getJSONArray("response_all_albums");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
+
+                                int artist_id = artistObj.getInt("album_id");
+                                String artistName = artistObj.getString("album_title");
+                                String image_url = artistObj.getString("cover_image_url");
+
+                                popularAlbums.add(new Albums(artist_id, artistName, image_url));
+                            }
+                            albumsAdapter.notifyDataSetChanged();
+                            saveAlbumsToSharedPreferences();
+                        } catch (Exception e) {
+                            unameTxt.setText(e.getMessage());
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("key_phone", firebaseUser.getPhoneNumber());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void saveAlbumsToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Albums artist : popularAlbums) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("album_id", artist.getAlbum_id());
+                artistObj.put("album_title", artist.getAlbum_id());
+                artistObj.put("cover_image_url", artist.getCover_image_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("popular_albums_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
+    }
+
+    private void fetchFavoriteArtists() {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_SELECTED_ARTISTS,
+                new Response.Listener<String>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            artists.clear();
+                            JSONObject j = new JSONObject(response);
+                            JSONArray jsonArray = j.getJSONArray("response_artists");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
+
+                                int artist_id = artistObj.getInt("artist_id");
+                                String artistName = artistObj.getString("artist_name");
+                                String image_url = artistObj.getString("image_url");
+
+                                artists.add(new Artists(artist_id, artistName, image_url));
+                            }
+                            favArtistsAdapter.notifyDataSetChanged();
+                            saveArtistsListToSharedPreferences();
+                        } catch (Exception e) {
+                            unameTxt.setText(e.getMessage());
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("key_phone", firebaseUser.getPhoneNumber());
+                return hm;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void saveArtistsListToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Artists artist : artists) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("artist_id", artist.getArtist_id());
+                artistObj.put("artist_name", artist.getArtist_name());
+                artistObj.put("image_url", artist.getImage_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("artists_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
     }
 
     private void saveArtistsDetailsToSharedPreferences() {

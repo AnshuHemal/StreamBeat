@@ -4,11 +4,13 @@ public class Artists {
     int artist_id;
     String artist_name;
     String image_url;
+    boolean isSelected;
 
     public Artists(int artist_id, String artist_name, String image_url) {
         this.artist_id = artist_id;
         this.artist_name = artist_name;
         this.image_url = image_url;
+        this.isSelected = false;
     }
 
     public int getArtist_id() {
@@ -33,5 +35,13 @@ public class Artists {
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

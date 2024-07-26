@@ -16,13 +16,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.SearchAdapter;
+import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.SharedViewModel;
+import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ExploreFragment extends Fragment {
 
@@ -32,6 +44,8 @@ public class ExploreFragment extends Fragment {
     private List<Object> searchResults;
     private EditText searchView;
     private LinearLayout no_keyword_found;
+    FirebaseUser firebaseUser;
+    private List<Integer> likedTracksIds;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +56,9 @@ public class ExploreFragment extends Fragment {
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         recyclerViewSearchResults = view.findViewById(R.id.recyclerViewSearchResults);
         recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        fetchUsersLikedTracks();
 
         no_keyword_found = view.findViewById(R.id.llNoKeywordFound);
 
@@ -107,5 +124,41 @@ public class ExploreFragment extends Fragment {
         if (searchAdapter != null) {
             searchAdapter.setCurrentlyPlayingPosition(position);
         }
+    }
+
+    public void fetchUsersLikedTracks() {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.FETCH_USERS_LIKED_TRACKS,
+                response -> {
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        likedTracksIds = new ArrayList<>();
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            int trackId = jsonArray.getJSONObject(i).getInt("track_id");
+                            likedTracksIds.add(trackId);
+
+                            for (Tracks track : sharedViewModel.getAllTracksList().getValue()) {
+                                if (track.getTrack_id() == trackId) {
+                                    track.setLikedByUser(true);
+                                }
+                            }
+                        }
+//                        displayLikedTracks();
+
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("user_phone", firebaseUser.getPhoneNumber());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 }

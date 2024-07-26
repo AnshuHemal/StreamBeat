@@ -50,9 +50,10 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setCurrentlyPlayingPosition(int position) {
         this.currentlyPlayingPosition = position;
-        notifyDataSetChanged(); // Notify adapter to update UI
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -109,6 +110,11 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.trackArtists.setText(artistsBuilder.toString());
         Picasso.get().load(track.getTrack_image_url()).into(holder.trackImage);
 
+        if (track.isLikedByUser()) {
+            holder.trackBtnLike.setImageResource(R.drawable.added);
+            holder.trackBtnLike.setColorFilter(ContextCompat.getColor(context, R.color.lightGreen));
+        }
+
         if (position == currentlyPlayingPosition) {
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightGreen));
         } else {
@@ -125,7 +131,6 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
                         setCurrentlyPlayingPosition(position);
                     } else {
-                        // Handle the case where the clicked item is not of type Tracks
                         Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -182,17 +187,18 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class TrackViewHolder extends RecyclerView.ViewHolder {
         TextView trackName, trackArtists;
-        ImageView trackImage;
+        ImageView trackImage, trackBtnLike;
 
         public TrackViewHolder(@NonNull View itemView) {
             super(itemView);
             trackName = itemView.findViewById(R.id.trackSearchName);
             trackArtists = itemView.findViewById(R.id.trackSearchArtistsName);
             trackImage = itemView.findViewById(R.id.trackSearchImage);
+            trackBtnLike = itemView.findViewById(R.id.btnLike);
         }
     }
 
-    public class AlbumViewHolder extends RecyclerView.ViewHolder {
+    public static class AlbumViewHolder extends RecyclerView.ViewHolder {
         TextView albumName;
         ImageView albumCover;
 

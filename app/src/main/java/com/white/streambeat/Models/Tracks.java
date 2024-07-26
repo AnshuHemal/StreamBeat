@@ -9,6 +9,7 @@ public class Tracks {
     String track_image_url;
     List<String> artist_names;
     String album_title;
+    boolean likedByUser;
 
     public Tracks(int track_id, String track_name, String file_url, String track_image_url, List<String> artist_names, String album_title) {
         this.track_id = track_id;
@@ -17,6 +18,15 @@ public class Tracks {
         this.track_image_url = track_image_url;
         this.artist_names = artist_names;
         this.album_title = album_title;
+        likedByUser = false;
+    }
+
+    public boolean isLikedByUser() {
+        return likedByUser;
+    }
+
+    public void setLikedByUser(boolean likedByUser) {
+        this.likedByUser = likedByUser;
     }
 
     public int getTrack_id() {

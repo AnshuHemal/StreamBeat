@@ -121,18 +121,15 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Object item = searchResults.get(position);
-                if (position != currentlyPlayingPosition) {
-                    if (item instanceof Tracks) {
-                        Tracks clickedTrack = (Tracks) item;
-                        ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
-                        setCurrentlyPlayingPosition(position);
-                    } else {
-                        Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
-                    }
+        holder.itemView.setOnClickListener(v -> {
+            Object item = searchResults.get(position);
+            if (position != currentlyPlayingPosition) {
+                if (item instanceof Tracks) {
+                    Tracks clickedTrack = (Tracks) item;
+                    ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
+                    setCurrentlyPlayingPosition(position);
+                } else {
+                    Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -38,6 +38,7 @@ import com.white.streambeat.Fragments.ProfileFragment;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
+import com.white.streambeat.TrackPlayerSheetFragment;
 import com.white.streambeat.databinding.ActivityDashboardBinding;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity implements TrackPlayerSheetFragment.OnTrackControlListener{
 
     ActivityDashboardBinding binding;
     FrameLayout frameLayout;
@@ -147,6 +148,14 @@ public class DashboardActivity extends AppCompatActivity {
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         registerReceiver(bluetoothReceiver, filter);
+
+        miniPlayerView.setOnClickListener(v -> {
+            if (currentTrack != null) {
+                TrackPlayerSheetFragment trackPlayerSheetFragment = new TrackPlayerSheetFragment(currentTrack);
+                trackPlayerSheetFragment.show(getSupportFragmentManager(), trackPlayerSheetFragment.getTag());
+                trackPlayerSheetFragment.setUpdateProgressRunnable();
+            }
+        });
     }
 
     private void loadFragment(Fragment fragment, boolean addToBackStack) {
@@ -183,16 +192,24 @@ public class DashboardActivity extends AppCompatActivity {
             updateProgressRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    int currentPosition = mediaPlayer.getCurrentPosition();
-                    trackProgressIndicator.setProgress(currentPosition);
-                    trackProgressIndicator.setMax(mediaPlayer.getDuration());
-                    handler.postDelayed(this, 1000);
+                    if (mediaPlayer != null) {
+                        int currentPosition = mediaPlayer.getCurrentPosition();
+                        trackProgressIndicator.setProgress(currentPosition);
+                        trackProgressIndicator.setMax(mediaPlayer.getDuration());
+
+                        Fragment fragment = getSupportFragmentManager().findFragmentByTag("TrackPlayerSheetFragment");
+                        if (fragment instanceof TrackPlayerSheetFragment) {
+                            ((TrackPlayerSheetFragment) fragment).updateProgress(currentPosition, mediaPlayer.getDuration());
+                        }
+                        handler.postDelayed(this, 1000);
+                    }
                 }
             };
             handler.post(updateProgressRunnable);
 
             if (mediaPlayer != null) {
                 mediaPlayer.release();
+                mediaPlayer = null;
             }
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setOnPreparedListener(mp -> {
@@ -201,6 +218,12 @@ public class DashboardActivity extends AppCompatActivity {
                 miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
                 handler.post(updateProgressRunnable);
             });
+
+//            mediaPlayer.setOnCompletionListener(mp -> {
+//                mediaPlayer.release();
+//                mediaPlayer = null;
+//                playNextTrack();
+//            });
 
             if (mediaPlayer.isPlaying()) {
                 miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
@@ -220,7 +243,7 @@ public class DashboardActivity extends AppCompatActivity {
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
 
-        Picasso.get().load("https://i.scdn.co/image/ab67706f0000000285c716247c24f66ef40f011e").into(miniPlayerImage);
+        Picasso.get().load(tracks.getTrack_image_url()).into(miniPlayerImage);
 
         StringBuilder artistsBuilder = new StringBuilder();
         for (int i = 0; i < tracks.getArtist_names().size(); i++) {
@@ -244,7 +267,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void pauseTrack() {
+    public void pauseTrack() {
         if (mediaPlayer != null && isPlaying) {
             mediaPlayer.pause();
             miniPlayerPlayPause.setImageResource(R.drawable.play_track);
@@ -253,7 +276,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void playTrack() {
+    public void playTrack() {
         if (mediaPlayer != null && !isPlaying) {
             mediaPlayer.start();
             miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
@@ -275,6 +298,47 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
+    public void playPreviousTrack() {
+        if (tracksList != null && !tracksList.isEmpty()) {
+            currentTrackPosition--;
+            if (currentTrackPosition < 0) {
+                currentTrackPosition = tracksList.size() - 1;
+            }
+            updateAlbumTracksAdapter();
+            updateSearchAdapter();
+            playCurrentTrack();
+            showMiniPlayer(tracksList.get(currentTrackPosition));
+        }
+    }
+
+    public int getCurrentPosition() {
+        if (mediaPlayer != null && isPlaying) {
+            return mediaPlayer.getCurrentPosition();
+        }
+        return 0;
+    }
+
+    public int getDuration() {
+        if (mediaPlayer != null) {
+            return mediaPlayer.getDuration();
+        }
+        return 0;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void seekTo(int position) {
+        if (mediaPlayer != null) {
+            mediaPlayer.seekTo(position);
+        }
+    }
+
+    public Tracks getCurrentTrack() {
+        return currentTrack;
+    }
+
     private void updateAlbumTracksAdapter() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         if (fragment instanceof AlbumTracksFragment) {
@@ -293,5 +357,9 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateProgressRunnable);
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

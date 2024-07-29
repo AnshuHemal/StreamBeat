@@ -49,8 +49,8 @@ public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdap
     public void onBindViewHolder(@NonNull PopularAlbumsAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
         holder.homeAlbumTextName.setText(albumsList.get(position).getAlbum_title());
-//        Picasso.get().load(albumsList.get(position).getCover_image_url()).into(holder.homeAlbumImage);
-        Picasso.get().load("https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680").into(holder.homeAlbumImage);
+        Picasso.get().load(albumsList.get(position).getCover_image_url()).into(holder.homeAlbumImage);
+//        Picasso.get().load("https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680").into(holder.homeAlbumImage);
 
         holder.homeAlbumLL.setOnClickListener(v -> {
             v.startAnimation(animation);

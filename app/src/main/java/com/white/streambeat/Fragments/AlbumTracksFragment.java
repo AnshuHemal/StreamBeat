@@ -22,7 +22,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.SharedViewModel;

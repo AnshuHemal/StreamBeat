@@ -250,8 +250,8 @@ public class HomeFragment extends Fragment {
                                 JSONObject albumObj = jsonArray.getJSONObject(i);
                                 int album_id = albumObj.getInt("album_id");
                                 String album_title = albumObj.getString("album_title");
-//                                String cover_image_url = albumObj.getString("cover_image_url");
-                                String cover_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
+                                String cover_image_url = albumObj.getString("cover_image_url");
+//                                String cover_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
                                 Albums albums = new Albums(album_id, album_title, cover_image_url);
                                 allAlbums.add(albums);
                             }
@@ -283,8 +283,8 @@ public class HomeFragment extends Fragment {
                                 int track_id = trackObj.getInt("track_id");
                                 String track_name = trackObj.getString("track_name");
                                 String file_url = trackObj.getString("file_url");
-//                                String track_image_url = trackObj.getString("track_image_url");
-                                String track_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
+                                String track_image_url = trackObj.getString("track_image_url");
+//                                String track_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
                                 String albumTitle = trackObj.getString("album_title");
 
                                 Object artistNamesObj = trackObj.get("artist_names");

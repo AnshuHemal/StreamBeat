@@ -33,14 +33,23 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
     public interface OnTrackControlListener {
         void playNextTrack();
+
         void playPreviousTrack();
+
         void playTrack();
+
         void pauseTrack();
+
         int getCurrentPosition();
+
         int getDuration();
+
         boolean isPlaying();
+
         void seekTo(int position);
+
         Tracks getCurrentTrack();
+
         int getRemainingDuration();
     }
 
@@ -122,7 +131,23 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         if (parent != null) {
             BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(parent);
             behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+            behavior.setHideable(true);
+            behavior.setDraggable(true);
+
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if (newState == BottomSheetBehavior.STATE_SETTLING) {
+                        dismiss();
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    // Optional: Handle sliding if needed
+                }
+            });
             if (updateProgressRunnable != null) {
                 handler.post(updateProgressRunnable);
             }

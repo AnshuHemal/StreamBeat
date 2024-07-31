@@ -1,11 +1,15 @@
 package com.white.streambeat.Activities;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -17,10 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
@@ -28,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
@@ -188,7 +195,14 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (currentTrackPosition >= 0 && currentTrackPosition < tracksList.size()) {
             currentTrack = tracksList.get(currentTrackPosition);
             showMiniPlayer(currentTrack);
-            handler = new Handler();
+            if (handler == null) {
+                handler = new Handler();
+            }
+
+            if (updateProgressRunnable != null) {
+                handler.removeCallbacks(updateProgressRunnable);
+            }
+
             updateProgressRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -201,6 +215,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         if (fragment instanceof TrackPlayerSheetFragment) {
                             ((TrackPlayerSheetFragment) fragment).updateProgress(currentPosition, mediaPlayer.getDuration());
                         }
+
                         handler.postDelayed(this, 1000);
                     }
                 }
@@ -219,12 +234,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                 handler.post(updateProgressRunnable);
             });
 
-//            mediaPlayer.setOnCompletionListener(mp -> {
-//                mediaPlayer.release();
-//                mediaPlayer = null;
-//                playNextTrack();
-//            });
-
             if (mediaPlayer.isPlaying()) {
                 miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
             } else {
@@ -232,8 +241,12 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             }
 
             try {
-                mediaPlayer.setDataSource(currentTrack.getFile_url());
-                mediaPlayer.prepareAsync();
+                if (currentTrack.getFile_url() != null && !currentTrack.getFile_url().isEmpty()) {
+                    mediaPlayer.setDataSource(currentTrack.getFile_url());
+                    mediaPlayer.prepareAsync();
+                } else {
+                    throw new IllegalArgumentException("Track URL is null or empty");
+                }
             } catch (IOException e) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -243,7 +256,27 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
 
-        Picasso.get().load(tracks.getTrack_image_url()).into(miniPlayerImage);
+        Picasso.get().load(tracks.getTrack_image_url())
+                .into(miniPlayerImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Bitmap bitmap = ((BitmapDrawable) miniPlayerImage.getDrawable()).getBitmap();
+                        Palette.from(bitmap).generate(palette -> {
+                            if (palette != null) {
+                                int dominantColor = palette.getDominantColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightGreen));
+                                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), miniPlayerView.getSolidColor(), dominantColor);
+                                colorAnimation.setDuration(300); // milliseconds
+                                colorAnimation.addUpdateListener(animator -> miniPlayerView.setBackgroundColor((int) animator.getAnimatedValue()));
+                                colorAnimation.start();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        miniPlayerView.setBackgroundColor(ContextCompat.getColor(DashboardActivity.this, R.color.darkTheme));
+                    }
+                });
 
         StringBuilder artistsBuilder = new StringBuilder();
         for (int i = 0; i < tracks.getArtist_names().size(); i++) {
@@ -287,9 +320,11 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
     public void playNextTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
-            currentTrackPosition++;
-            if (currentTrackPosition >= tracksList.size()) {
-                currentTrackPosition = 0;
+            if (tracksList.size() > 1) {
+                currentTrackPosition++;
+                if (currentTrackPosition >= tracksList.size()) {
+                    currentTrackPosition = 0;
+                }
             }
             updateAlbumTracksAdapter();
             updateSearchAdapter();
@@ -300,9 +335,11 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
     public void playPreviousTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
-            currentTrackPosition--;
-            if (currentTrackPosition < 0) {
-                currentTrackPosition = tracksList.size() - 1;
+            if (tracksList.size() > 1) {
+                currentTrackPosition--;
+                if (currentTrackPosition < 0) {
+                    currentTrackPosition = tracksList.size() - 1;
+                }
             }
             updateAlbumTracksAdapter();
             updateSearchAdapter();
@@ -321,6 +358,15 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     public int getDuration() {
         if (mediaPlayer != null) {
             return mediaPlayer.getDuration();
+        }
+        return 0;
+    }
+
+    public int getRemainingDuration() {
+        if (mediaPlayer != null) {
+            int duration = mediaPlayer.getDuration();
+            int currentDuration = mediaPlayer.getCurrentPosition();
+            return  duration - currentDuration;
         }
         return 0;
     }
@@ -356,7 +402,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(updateProgressRunnable);
+        if (handler != null) {
+            handler.removeCallbacks(updateProgressRunnable);
+        }
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;

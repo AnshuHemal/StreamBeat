@@ -41,6 +41,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         boolean isPlaying();
         void seekTo(int position);
         Tracks getCurrentTrack();
+        int getRemainingDuration();
     }
 
     public TrackPlayerSheetFragment(Tracks track) {
@@ -158,7 +159,12 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                 if (trackControlListener != null) {
                     int currentPosition = trackControlListener.getCurrentPosition();
                     int duration = trackControlListener.getDuration();
+                    int remainingTime = trackControlListener.getRemainingDuration();
                     updateProgress(currentPosition, duration);
+                    if (remainingTime <= 1000) {
+                        trackControlListener.playNextTrack();
+                        return;
+                    }
                     handler.postDelayed(this, 1000);
                 }
             }
@@ -225,6 +231,5 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                 Picasso.get().load(track.getTrack_image_url()).into(trackImage);
             }
         }
-
     }
 }

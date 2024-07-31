@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,10 +19,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
@@ -288,7 +285,7 @@ public class HomeFragment extends Fragment {
                                 String albumTitle = trackObj.getString("album_title");
 
                                 Object artistNamesObj = trackObj.get("artist_names");
-                                List<String> artistNames = new ArrayList<>();
+                                ArrayList<String> artistNames = new ArrayList<>();
                                 if (artistNamesObj instanceof JSONArray) {
                                     JSONArray artistNamesArray = (JSONArray) artistNamesObj;
                                     for (int j = 0; j < artistNamesArray.length(); j++) {

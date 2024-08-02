@@ -22,7 +22,6 @@
         <item name="android:progressBackgroundTint">#43B0B0B0</item>
         <item name="android:progressTint">@color/white</item>
         <item name="android:thumbTint">@color/white</item>
-        <item name="android:thickness">5dp</item>
     </style>
     
 </resources>

@@ -1,29 +1,45 @@
 package com.white.streambeat;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.core.content.ContextCompat;
+import androidx.palette.graphics.Palette;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.white.streambeat.Models.Tracks;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
-    ImageView trackImage, playPauseButton, playNextTrack, playPreviousTrack;
+    ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton;
     TextView trackName, artistNames, currentTime, totalTime;
     AppCompatSeekBar seekBar;
+    FloatingActionButton playPauseButton;
+    RelativeLayout sheetDialogMain;
 
     Tracks track;
     Handler handler = new Handler();
@@ -71,6 +87,10 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         currentTime = view.findViewById(R.id.currentTimeTxt);
         totalTime = view.findViewById(R.id.totalTimeTxt);
         seekBar = view.findViewById(R.id.seekBar);
+        sheetDialogMain = view.findViewById(R.id.sheetDialogMain);
+        arrowDownButton = view.findViewById(R.id.arrowDownBtn);
+
+        arrowDownButton.setOnClickListener(v -> dismiss());
 
         updateTrackDetails();
 
@@ -145,7 +165,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    // Optional: Handle sliding if needed
+
                 }
             });
             if (updateProgressRunnable != null) {
@@ -245,6 +265,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
             Tracks track = trackControlListener.getCurrentTrack();
             if (track != null) {
                 trackName.setText(track.getTrack_name());
+                trackName.setSelected(true);
                 StringBuilder artistsBuilder = new StringBuilder();
                 for (int i = 0; i < track.getArtist_names().size(); i++) {
                     artistsBuilder.append(track.getArtist_names().get(i));
@@ -253,7 +274,35 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                     }
                 }
                 artistNames.setText(artistsBuilder.toString());
-                Picasso.get().load(track.getTrack_image_url()).into(trackImage);
+                Picasso.get().load(track.getTrack_image_url())
+                        .into(trackImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Bitmap bitmap = ((BitmapDrawable) trackImage.getDrawable()).getBitmap();
+                                Palette.from(bitmap).generate(palette -> {
+                                    if (palette != null) {
+//                                        int dominantColor = palette.getDominantColor(ContextCompat.getColor(requireContext(), R.color.lightGreen));
+//                                        sheetDialogMain.setBackgroundColor(dominantColor);
+
+                                        int[] colors = new int[]{
+                                                palette.getVibrantColor(ContextCompat.getColor(requireContext(), R.color.white)),
+                                                palette.getDarkMutedColor(ContextCompat.getColor(requireContext(), R.color.darkTheme))
+
+                                        };
+                                        GradientDrawable gradientDrawable = new GradientDrawable(
+                                                GradientDrawable.Orientation.TOP_BOTTOM,
+                                                colors
+                                        );
+                                        sheetDialogMain.setBackground(gradientDrawable);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                sheetDialogMain.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darkTheme));
+                            }
+                        });
             }
         }
     }

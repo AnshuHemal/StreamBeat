@@ -3,29 +3,41 @@ package com.white.streambeat.Activities;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.palette.graphics.Palette;
 
 import com.android.volley.Request;
@@ -36,6 +48,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Fragments.ExploreFragment;
@@ -44,6 +57,7 @@ import com.white.streambeat.Fragments.LibraryFragment;
 import com.white.streambeat.Fragments.ProfileFragment;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
+import com.white.streambeat.NotificationReceiver;
 import com.white.streambeat.R;
 import com.white.streambeat.TrackPlayerSheetFragment;
 import com.white.streambeat.databinding.ActivityDashboardBinding;
@@ -54,7 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class DashboardActivity extends AppCompatActivity implements TrackPlayerSheetFragment.OnTrackControlListener{
+public class DashboardActivity extends AppCompatActivity implements TrackPlayerSheetFragment.OnTrackControlListener {
 
     ActivityDashboardBinding binding;
     FrameLayout frameLayout;
@@ -65,6 +79,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     View miniPlayerView;
     TextView miniPlayerTitle, miniPlayerArtistsNames;
     ImageView miniPlayerPlayPause, miniPlayerShuffle, miniPlayerImage;
+
+    MediaSessionCompat mediaSession;
+    private static final String CHANNEL_ID = "music_channel";
 
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
@@ -117,6 +134,10 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Objects.requireNonNull(getSupportActionBar()).hide();
+
+        requestNotificationPermission();
+
+        setupMediaSession();
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -195,6 +216,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (currentTrackPosition >= 0 && currentTrackPosition < tracksList.size()) {
             currentTrack = tracksList.get(currentTrackPosition);
             showMiniPlayer(currentTrack);
+            showNotification();
             if (handler == null) {
                 handler = new Handler();
             }
@@ -206,8 +228,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             updateProgressRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediaPlayer != null) {
+                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                         int currentPosition = mediaPlayer.getCurrentPosition();
+
                         trackProgressIndicator.setProgress(currentPosition);
                         trackProgressIndicator.setMax(mediaPlayer.getDuration());
 
@@ -215,7 +238,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         if (fragment instanceof TrackPlayerSheetFragment) {
                             ((TrackPlayerSheetFragment) fragment).updateProgress(currentPosition, mediaPlayer.getDuration());
                         }
-
+                        showNotification();
                         handler.postDelayed(this, 1000);
                     }
                 }
@@ -289,7 +312,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         miniPlayerView.setVisibility(View.VISIBLE);
 
         miniPlayerPlayPause.setOnClickListener(v -> togglePlayback());
-        miniPlayerShuffle.setOnClickListener(v -> playNextTrack());
+        miniPlayerShuffle.setOnClickListener(v -> {
+            playNextTrack();
+        });
     }
 
     public void togglePlayback() {
@@ -303,18 +328,28 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     public void pauseTrack() {
         if (mediaPlayer != null && isPlaying) {
             mediaPlayer.pause();
-            miniPlayerPlayPause.setImageResource(R.drawable.play_track);
             isPlaying = false;
-            handler.removeCallbacks(updateProgressRunnable);
+            miniPlayerPlayPause.setImageResource(R.drawable.play_track);
+
+            runOnUiThread(() -> {
+                handler.removeCallbacks(updateProgressRunnable); // Stop updating progress
+            });
+            showNotification();
         }
     }
 
     public void playTrack() {
         if (mediaPlayer != null && !isPlaying) {
             mediaPlayer.start();
-            miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
             isPlaying = true;
-            handler.post(updateProgressRunnable);
+            miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
+
+            runOnUiThread(() -> {
+                trackProgressIndicator.setProgress(mediaPlayer.getCurrentPosition());
+                trackProgressIndicator.setMax(mediaPlayer.getDuration());
+                handler.post(updateProgressRunnable); // Ensure progress is updated
+            });
+            showNotification();
         }
     }
 
@@ -330,6 +365,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             updateSearchAdapter();
             playCurrentTrack();
             showMiniPlayer(tracksList.get(currentTrackPosition));
+            showNotification();
         }
     }
 
@@ -345,6 +381,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             updateSearchAdapter();
             playCurrentTrack();
             showMiniPlayer(tracksList.get(currentTrackPosition));
+            showNotification();
         }
     }
 
@@ -366,7 +403,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (mediaPlayer != null) {
             int duration = mediaPlayer.getDuration();
             int currentDuration = mediaPlayer.getCurrentPosition();
-            return  duration - currentDuration;
+            return duration - currentDuration;
         }
         return 0;
     }
@@ -399,6 +436,97 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         }
     }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "StreamBeat";
+            String description = "Channel for music playback";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+            } else {
+                createNotificationChannel();
+            }
+        } else {
+            createNotificationChannel();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void showNotification() {
+        if (currentTrack == null) return;
+
+        Intent playPauseIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("PLAY_PAUSE");
+        PendingIntent playPausePendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Intent nextIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("NEXT");
+        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Intent previousIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("PREVIOUS");
+        PendingIntent previousPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 2, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+//        Intent seekIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("SEEK");
+//        seekIntent.putExtra("position", mediaPlayer != null ? mediaPlayer.getCurrentPosition() + 10000 : 0); // Example: Seek forward by 10 seconds
+//        PendingIntent seekPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 3, seekIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Picasso.get().load(currentTrack.getTrack_image_url()).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentTitle(currentTrack.getTrack_name())
+                        .setContentText(String.join(", ", currentTrack.getArtist_names()))
+                        .setLargeIcon(bitmap)
+                        .addAction(R.drawable.previous_track, "Previous", previousPendingIntent)
+                        .addAction(isPlaying ? R.drawable.pause_track : R.drawable.play_track, "Play/Pause", playPausePendingIntent)
+                        .addAction(R.drawable.next_track, "Next", nextPendingIntent)
+                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                                .setMediaSession(mediaSession.getSessionToken())
+                                .setShowActionsInCompactView(0, 1, 2))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setOngoing(true)
+                        .setProgress(100, 50, false); // Set progress for notification
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                notificationManager.notify(1, builder.build());
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                // Handle error
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                // Handle preparation
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                createNotificationChannel();
+            } else {
+                Toast.makeText(this, "Notification permission is required for notifications", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -409,5 +537,93 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             mediaPlayer.release();
             mediaPlayer = null;
         }
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession = null;
+        }
+        unregisterReceiver(bluetoothReceiver);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.cancel(1);
     }
+
+    private final BroadcastReceiver localReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getStringExtra("action");
+            if (action != null) {
+                switch (action) {
+                    case "PLAY_PAUSE":
+                        if (mediaPlayer != null) {
+                            if (mediaPlayer.isPlaying()) {
+                                pauseTrack();
+                            } else {
+                                playTrack();
+                            }
+                        }
+                        break;
+                    case "NEXT":
+                        playNextTrack();
+                        break;
+                    case "PREVIOUS":
+                        playPreviousTrack();
+                        break;
+                    case "SEEK":
+                        int position = intent.getIntExtra("position", 0);
+                        seekTo(position);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    };
+
+    private void setupMediaSession() {
+        mediaSession = new MediaSessionCompat(this, "MusicPlayerSession");
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                playTrack();
+            }
+
+            @Override
+            public void onPause() {
+                pauseTrack();
+            }
+
+            @Override
+            public void onSkipToNext() {
+                playNextTrack();
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                playPreviousTrack();
+            }
+
+            @Override
+            public void onSeekTo(long pos) {
+                seekTo((int) pos);
+            }
+        });
+
+        mediaSession.setMediaButtonReceiver(null);
+        mediaSession.setActive(true);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(localReceiver, new IntentFilter("com.white.streambeat.ACTION"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(localReceiver);
+    }
+
 }

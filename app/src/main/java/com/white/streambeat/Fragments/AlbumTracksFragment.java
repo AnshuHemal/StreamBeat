@@ -20,8 +20,11 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.SharedViewModel;
@@ -40,7 +43,7 @@ public class AlbumTracksFragment extends Fragment {
     private RecyclerView recyclerView;
     private TracksAdapter tracksAdapter;
     SharedViewModel sharedViewModel;
-    String albumTitle;
+    String albumTitle, albumCoverImageUrl;
     private List<Integer> likedTracksIds;
     FirebaseUser firebaseUser;
 
@@ -54,6 +57,7 @@ public class AlbumTracksFragment extends Fragment {
 
         ImageView backBtn = view.findViewById(R.id.btnBackLF);
         TextView txtAlbumTitle = view.findViewById(R.id.txtAlbumTitle);
+        ImageView albumImage = view.findViewById(R.id.albumImage);
         recyclerView = view.findViewById(R.id.albumTracksRV);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         tracksAdapter = new TracksAdapter(getContext());
@@ -61,6 +65,8 @@ public class AlbumTracksFragment extends Fragment {
 
         assert getArguments() != null;
         albumTitle = getArguments().getString("album_title", "");
+        albumCoverImageUrl = getArguments().getString("album_image_url", "");
+        Picasso.get().load(albumCoverImageUrl).into(albumImage);
         txtAlbumTitle.setText(albumTitle);
         fetchUsersLikedTracks();
 

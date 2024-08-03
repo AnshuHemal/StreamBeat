@@ -50,14 +50,13 @@ public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdap
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
         holder.homeAlbumTextName.setText(albumsList.get(position).getAlbum_title());
         Picasso.get().load(albumsList.get(position).getCover_image_url()).into(holder.homeAlbumImage);
-//        Picasso.get().load("https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680").into(holder.homeAlbumImage);
 
         holder.homeAlbumLL.setOnClickListener(v -> {
             v.startAnimation(animation);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    navigateToAlbumTracksFragment(fragmentManager, albumsList.get(position).getAlbum_title());
+                    navigateToAlbumTracksFragment(fragmentManager, albumsList.get(position).getAlbum_title(), albumsList.get(position).getCover_image_url());
                 }
             }, 100);
         });
@@ -80,9 +79,11 @@ public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdap
             homeAlbumLL = itemView.findViewById(R.id.homeBestOfArtistsAlbumLL);
         }
     }
-    public void navigateToAlbumTracksFragment(FragmentManager fragmentManager, String album_title) {
+    public void navigateToAlbumTracksFragment(FragmentManager fragmentManager, String album_title, String album_image_url) {
         Bundle bundle = new Bundle();
         bundle.putString("album_title", album_title);
+        bundle.putString("album_image_url", album_image_url);
+
 
         AlbumTracksFragment albumTracksFragment = new AlbumTracksFragment();
         albumTracksFragment.setArguments(bundle);

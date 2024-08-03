@@ -476,10 +476,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Intent previousIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("PREVIOUS");
         PendingIntent previousPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 2, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-//        Intent seekIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("SEEK");
-//        seekIntent.putExtra("position", mediaPlayer != null ? mediaPlayer.getCurrentPosition() + 10000 : 0); // Example: Seek forward by 10 seconds
-//        PendingIntent seekPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 3, seekIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
         Picasso.get().load(currentTrack.getTrack_image_url()).into(new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -496,8 +492,8 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                                 .setMediaSession(mediaSession.getSessionToken())
                                 .setShowActionsInCompactView(0, 1, 2))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setOngoing(true)
-                        .setProgress(100, 50, false); // Set progress for notification
+                        .setOngoing(isPlaying)
+                        .setProgress(100, 50, false);
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                 notificationManager.notify(1, builder.build());

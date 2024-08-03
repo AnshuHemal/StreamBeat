@@ -63,8 +63,11 @@ import com.white.streambeat.TrackPlayerSheetFragment;
 import com.white.streambeat.databinding.ActivityDashboardBinding;
 
 import java.io.IOException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -216,7 +219,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (currentTrackPosition >= 0 && currentTrackPosition < tracksList.size()) {
             currentTrack = tracksList.get(currentTrackPosition);
             showMiniPlayer(currentTrack);
+            saveUserLog(currentTrack);
             showNotification();
+
             if (handler == null) {
                 handler = new Handler();
             }
@@ -434,6 +439,25 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (fragment instanceof ExploreFragment) {
             ((ExploreFragment) fragment).updateCurrentlyPlayingPosition(currentTrackPosition);
         }
+    }
+
+    private void saveUserLog(Tracks track) {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.SAVE_USER_LOGS,
+                response -> {},
+                error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("key_phone", firebaseUser.getPhoneNumber());
+                hashMap.put("track_ids", String.valueOf(track.getTrack_id()));
+                hashMap.put("listen_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+                return hashMap;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
     private void createNotificationChannel() {

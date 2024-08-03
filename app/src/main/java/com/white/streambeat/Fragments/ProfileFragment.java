@@ -23,16 +23,29 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
         llSettings = view.findViewById(R.id.llSettings);
+        llHistory = view.findViewById(R.id.llListeningHistory);
+
         llSettings.setOnClickListener(v -> {
-            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
             v.startAnimation(animation);
 
             new Handler().postDelayed(() -> {
                 Fragment settingsFragment = new SettingsFragment();
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.replace(R.id.frameLayout, settingsFragment);
+                transaction.commit();
+            },100);
+        });
+
+        llHistory.setOnClickListener(v -> {
+            v.startAnimation(animation);
+
+            new Handler().postDelayed(() -> {
+                Fragment historyFragment = new ListeningHistoryFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.frameLayout, historyFragment);
                 transaction.commit();
             },100);
         });

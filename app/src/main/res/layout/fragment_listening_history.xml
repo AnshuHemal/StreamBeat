@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightTheme"
+    android:orientation="vertical"
+    tools:context=".Fragments.ListeningHistoryFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/lightTheme"
+        android:contentInsetStart="0dp"
+        android:contentInsetEnd="0dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_collapseMode="pin"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/btnBackLF"
+            android:layout_width="20dp"
+            android:layout_height="30dp"
+            android:layout_gravity="start"
+            android:src="@drawable/arrow_left"
+            app:tint="@color/white" />
+
+        <!-- Title in Toolbar -->
+        <TextView
+            android:id="@+id/txtAlbumTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/mulish_medium"
+            android:gravity="center"
+            android:text="Recently played"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listeningHistoryRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp" />
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

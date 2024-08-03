@@ -16,6 +16,15 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<List<Object>> searchResults = new MutableLiveData<>();
     private final MutableLiveData<List<Artists>> favoriteArtistsList = new MutableLiveData<>();
     private final MutableLiveData<List<Artists>> filteredArtistsList = new MutableLiveData<>();
+    private final MutableLiveData<List<Integer>> trackIdsList = new MutableLiveData<>();
+
+    public LiveData<List<Integer>> getTrackIdsList() {
+        return trackIdsList;
+    }
+
+    public void setTrackIdsList(List<Integer> trackIds) {
+        trackIdsList.setValue(trackIds);
+    }
 
     public MutableLiveData<List<Artists>> getFavoriteArtistsList() {
         return favoriteArtistsList;

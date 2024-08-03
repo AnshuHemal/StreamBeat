@@ -317,9 +317,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         miniPlayerView.setVisibility(View.VISIBLE);
 
         miniPlayerPlayPause.setOnClickListener(v -> togglePlayback());
-        miniPlayerShuffle.setOnClickListener(v -> {
-            playNextTrack();
-        });
+        miniPlayerShuffle.setOnClickListener(v -> playNextTrack());
     }
 
     public void togglePlayback() {
@@ -337,7 +335,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             miniPlayerPlayPause.setImageResource(R.drawable.play_track);
 
             runOnUiThread(() -> {
-                handler.removeCallbacks(updateProgressRunnable); // Stop updating progress
+                handler.removeCallbacks(updateProgressRunnable);
             });
             showNotification();
         }
@@ -445,7 +443,8 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.SAVE_USER_LOGS,
-                response -> {},
+                response -> {
+                },
                 error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
         ) {
             @Override

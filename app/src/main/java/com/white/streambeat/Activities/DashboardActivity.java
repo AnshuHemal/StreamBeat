@@ -352,7 +352,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             runOnUiThread(() -> {
                 trackProgressIndicator.setProgress(mediaPlayer.getCurrentPosition());
                 trackProgressIndicator.setMax(mediaPlayer.getDuration());
-                handler.post(updateProgressRunnable); // Ensure progress is updated
+                handler.post(updateProgressRunnable);
             });
             showNotification();
         }

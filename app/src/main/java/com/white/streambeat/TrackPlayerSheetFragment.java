@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,12 +105,14 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                handler.removeCallbacks(updateProgressRunnable);
+                if (updateProgressRunnable != null) {
+                    handler.removeCallbacks(updateProgressRunnable);
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                handler.post(updateProgressRunnable);
+                setUpdateProgressRunnable();
             }
         });
 
@@ -125,6 +128,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                 trackControlListener.playPreviousTrack();
                 updateTrackDetails();
             }
+
         });
 
         updateUI();
@@ -168,9 +172,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
                 }
             });
-            if (updateProgressRunnable != null) {
-                handler.post(updateProgressRunnable);
-            }
+            setUpdateProgressRunnable();
         }
     }
 
@@ -204,12 +206,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                 if (trackControlListener != null) {
                     int currentPosition = trackControlListener.getCurrentPosition();
                     int duration = trackControlListener.getDuration();
-                    int remainingTime = trackControlListener.getRemainingDuration();
                     updateProgress(currentPosition, duration);
-                    if (remainingTime <= 1000) {
-                        trackControlListener.playNextTrack();
-                        return;
-                    }
                     handler.postDelayed(this, 1000);
                 }
             }
@@ -265,15 +262,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
             Tracks track = trackControlListener.getCurrentTrack();
             if (track != null) {
                 trackName.setText(track.getTrack_name());
-                trackName.setSelected(true);
-                StringBuilder artistsBuilder = new StringBuilder();
-                for (int i = 0; i < track.getArtist_names().size(); i++) {
-                    artistsBuilder.append(track.getArtist_names().get(i));
-                    if (i < track.getArtist_names().size() - 1) {
-                        artistsBuilder.append(", ");
-                    }
-                }
-                artistNames.setText(artistsBuilder.toString());
+                artistNames.setText(TextUtils.join(", ", track.getArtist_names()));
                 Picasso.get().load(track.getTrack_image_url())
                         .into(trackImage, new Callback() {
                             @Override
@@ -281,13 +270,9 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                                 Bitmap bitmap = ((BitmapDrawable) trackImage.getDrawable()).getBitmap();
                                 Palette.from(bitmap).generate(palette -> {
                                     if (palette != null) {
-//                                        int dominantColor = palette.getDominantColor(ContextCompat.getColor(requireContext(), R.color.lightGreen));
-//                                        sheetDialogMain.setBackgroundColor(dominantColor);
-
                                         int[] colors = new int[]{
                                                 palette.getVibrantColor(ContextCompat.getColor(requireContext(), R.color.white)),
                                                 palette.getDarkMutedColor(ContextCompat.getColor(requireContext(), R.color.darkTheme))
-
                                         };
                                         GradientDrawable gradientDrawable = new GradientDrawable(
                                                 GradientDrawable.Orientation.TOP_BOTTOM,
@@ -303,7 +288,11 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                                 sheetDialogMain.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darkTheme));
                             }
                         });
+                seekBar.setProgress(0); // Reset position if needed
+                updateProgress(0, trackControlListener.getDuration());
+//                updateUI();
             }
         }
+
     }
 }

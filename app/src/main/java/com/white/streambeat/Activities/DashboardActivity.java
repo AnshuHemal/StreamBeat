@@ -21,6 +21,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -239,6 +240,13 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         trackProgressIndicator.setProgress(currentPosition);
                         trackProgressIndicator.setMax(mediaPlayer.getDuration());
 
+                        int remainingTime = getRemainingDuration();
+
+                        if (remainingTime <= 1000) {
+                            playNextTrack();
+                            return;
+                        }
+
                         Fragment fragment = getSupportFragmentManager().findFragmentByTag("TrackPlayerSheetFragment");
                         if (fragment instanceof TrackPlayerSheetFragment) {
                             ((TrackPlayerSheetFragment) fragment).updateProgress(currentPosition, mediaPlayer.getDuration());
@@ -346,31 +354,55 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             mediaPlayer.start();
             isPlaying = true;
             miniPlayerPlayPause.setImageResource(R.drawable.pause_track);
-
-            runOnUiThread(() -> {
-                trackProgressIndicator.setProgress(mediaPlayer.getCurrentPosition());
-                trackProgressIndicator.setMax(mediaPlayer.getDuration());
-                handler.post(updateProgressRunnable);
-            });
+            trackProgressIndicator.setProgress(mediaPlayer.getCurrentPosition());
+            trackProgressIndicator.setMax(mediaPlayer.getDuration());
+            handler.post(updateProgressRunnable);
             showNotification();
         }
     }
 
     public void playNextTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
-            if (tracksList.size() > 1) {
-                currentTrackPosition++;
-                if (currentTrackPosition >= tracksList.size()) {
-                    currentTrackPosition = 0;
-                }
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
             }
+
+            currentTrackPosition++;
+            if (currentTrackPosition >= tracksList.size()) {
+                currentTrackPosition = 0; // Loop back to the start
+            }
+            Tracks nextTrack = tracksList.get(currentTrackPosition);
+
+            playCurrentTrack();
+            showMiniPlayer(nextTrack);
+            showNotification();
             updateAlbumTracksAdapter();
             updateSearchAdapter();
-            playCurrentTrack();
-            showMiniPlayer(tracksList.get(currentTrackPosition));
-            showNotification();
+        } else {
+            Log.e("TrackPlayer", "Track list is null or empty.");
         }
+
+//        if (currentTrackPosition < tracksList.size() - 1) {
+//            currentTrackPosition++;
+//            Tracks nextTrack = tracksList.get(currentTrackPosition);
+//            playCurrentTrack();
+//            showMiniPlayer(nextTrack);
+//            showNotification();
+//            updateAlbumTracksAdapter();
+//            updateSearchAdapter();
+//        } else {
+//            currentTrackPosition = 0;
+//            Tracks nextTrack = tracksList.get(currentTrackPosition);
+//            playCurrentTrack();
+//            showMiniPlayer(nextTrack);
+//            showNotification();
+//            updateAlbumTracksAdapter();
+//            updateSearchAdapter();
+//        }
     }
+
 
     public void playPreviousTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {

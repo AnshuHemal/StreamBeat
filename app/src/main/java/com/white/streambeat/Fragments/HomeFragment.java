@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -178,7 +179,7 @@ public class HomeFragment extends Fragment {
                 response -> {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.optJSONArray("response_obj");
+                        JSONArray jsonArray = jsonObject.getJSONArray("response_obj");
 
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject j1 = jsonArray.getJSONObject(i);
@@ -207,6 +208,7 @@ public class HomeFragment extends Fragment {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
                 response -> {
+                    Log.d(TAG, "fetchAllArtists response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_artists");
@@ -238,6 +240,11 @@ public class HomeFragment extends Fragment {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ALBUMS_DETAILS,
                 response -> {
+                    Log.d(TAG, "fetchAllAlbums response: " + response); // Log response
+                    if (response == null || response.isEmpty()) {
+                        Toast.makeText(requireContext(), "Empty response from server", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_albums");
@@ -248,7 +255,6 @@ public class HomeFragment extends Fragment {
                                 int album_id = albumObj.getInt("album_id");
                                 String album_title = albumObj.getString("album_title");
                                 String cover_image_url = albumObj.getString("cover_image_url");
-//                                String cover_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
                                 Albums albums = new Albums(album_id, album_title, cover_image_url);
                                 allAlbums.add(albums);
                             }
@@ -266,53 +272,55 @@ public class HomeFragment extends Fragment {
 
     private void fetchAllTracks() {
         StringRequest stringRequest = new StringRequest(
-                Request.Method.GET,
+                Request.Method.POST,
                 ServerConnector.GET_ALL_TRACKS_DETAILS,
                 response -> {
-                    Log.d(TAG, "onResponse: HomeFragment" + response);
+                    Log.d(TAG, "fetchAllTracks response: " + response); // Log response
+                    if (response == null || response.trim().isEmpty()) {
+                        Toast.makeText(requireContext(), "Empty response from server", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_tracks");
                         allTracks.clear();
-                        if (isAdded()) {
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject trackObj = jsonArray.getJSONObject(i);
-                                int track_id = trackObj.getInt("track_id");
-                                String track_name = trackObj.getString("track_name");
-                                String file_url = trackObj.getString("file_url");
-                                String track_image_url = trackObj.getString("track_image_url");
-//                                String track_image_url = "https://hollywoodlife.com/wp-content/uploads/2018/03/rexfeatures_9623254w.jpg?w=680";
-                                String albumTitle = trackObj.getString("album_title");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject trackObj = jsonArray.getJSONObject(i);
+                            int track_id = trackObj.getInt("track_id");
+                            String track_name = trackObj.getString("track_name");
+                            String file_url = trackObj.getString("file_url");
+                            String track_image_url = trackObj.getString("track_image_url");
+                            String albumTitle = trackObj.getString("album_title");
 
-                                Object artistNamesObj = trackObj.get("artist_names");
-                                ArrayList<String> artistNames = new ArrayList<>();
-                                if (artistNamesObj instanceof JSONArray) {
-                                    JSONArray artistNamesArray = (JSONArray) artistNamesObj;
-                                    for (int j = 0; j < artistNamesArray.length(); j++) {
-                                        artistNames.add(artistNamesArray.getString(j));
-                                    }
-                                } else if (artistNamesObj instanceof String) {
-                                    artistNames.add((String) artistNamesObj);
-                                }
-                                Tracks track = new Tracks(track_id, track_name, file_url, track_image_url, artistNames, albumTitle);
-                                allTracks.add(track);
+                            String artistNamesString = trackObj.getString("artist_names");
+                            String[] artistNamesArray = artistNamesString.split(", ");
+                            ArrayList<String> artistNames = new ArrayList<>(Arrays.asList(artistNamesArray));
 
-                                for (Albums album : allAlbums) {
-                                    if (album.getAlbum_title().equals(albumTitle)) {
-                                        album.addTrack(track);
-                                        break;
-                                    }
+                            Tracks track = new Tracks(track_id, track_name, file_url, track_image_url, artistNames, albumTitle);
+                            allTracks.add(track);
+
+                            for (Albums album : allAlbums) {
+                                if (album.getAlbum_title().equals(albumTitle)) {
+                                    album.addTrack(track);
+                                    break;
                                 }
                             }
-                            saveTracksDetailsToSharedPreferences();
-                            sharedViewModel.setAllTracksList(allTracks);
                         }
-
+                        saveTracksDetailsToSharedPreferences();
+                        sharedViewModel.setAllTracksList(allTracks);
+                    } catch (JSONException e) {
+                        Toast.makeText(getContext(), "JSON Parsing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
+                        e.printStackTrace();
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
-        );
+                },
+                error -> {
+                    Log.e(TAG, "Volley Error: ", error); // Log error details
+                    Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+        ){};
+
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 

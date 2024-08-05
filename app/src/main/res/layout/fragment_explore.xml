@@ -35,7 +35,7 @@
 
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_below="@id/ll1"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
@@ -49,6 +49,6 @@
             android:layout_marginTop="10dp"
             android:visibility="gone" />
 
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
 </RelativeLayout>

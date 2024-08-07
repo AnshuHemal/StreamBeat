@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.white.streambeat.Models.Tracks;
+import com.white.streambeat.Models.Albums;
 import com.white.streambeat.R;
 
 import java.util.List;
@@ -18,9 +18,9 @@ import java.util.Map;
 
 public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHolder> {
     Context context;
-    Map<String, List<Tracks>> dateWithTracksMap;
+    Map<String, List<Albums>> dateWithTracksMap;
 
-    public UserLogsAdapter(Context context, Map<String, List<Tracks>> dateWithTracksMap) {
+    public UserLogsAdapter(Context context, Map<String, List<Albums>> dateWithTracksMap) {
         this.context = context;
         this.dateWithTracksMap = dateWithTracksMap;
     }
@@ -35,14 +35,13 @@ public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull UserLogsAdapter.ViewHolder holder, int position) {
         String date = (String) dateWithTracksMap.keySet().toArray()[position];
-        List<Tracks> tracks = dateWithTracksMap.get(date);
+        List<Albums> albums = dateWithTracksMap.get(date);
 
         holder.dateTextView.setText(date);
 
-        TracksAdapter tracksAdapter = new TracksAdapter(context);
-        holder.tracksRecyclerView.setAdapter(tracksAdapter);
+        PopularAlbumsAdapter albumsAdapter = new PopularAlbumsAdapter(context, albums, null);
+        holder.tracksRecyclerView.setAdapter(albumsAdapter);
         holder.tracksRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        tracksAdapter.setTracksList(tracks);
     }
 
     @Override

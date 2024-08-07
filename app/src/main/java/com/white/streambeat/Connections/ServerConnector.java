@@ -18,4 +18,5 @@ public class ServerConnector {
     public static String GET_POPULAR_ALBUMS = serverUrl + "get_popular_albums";
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";
     public static String SAVE_USER_LOGS = serverUrl + "save_user_logs";
+    public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
 }

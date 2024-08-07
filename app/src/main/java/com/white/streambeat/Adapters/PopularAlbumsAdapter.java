@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,12 +51,7 @@ public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdap
 
         holder.homeAlbumLL.setOnClickListener(v -> {
             v.startAnimation(animation);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    navigateToAlbumTracksFragment(fragmentManager, albumsList.get(position).getAlbum_title(), albumsList.get(position).getCover_image_url());
-                }
-            }, 100);
+            new Handler().postDelayed(() -> navigateToAlbumTracksFragment(fragmentManager, albumsList.get(position).getAlbum_title(), albumsList.get(position).getCover_image_url()), 100);
         });
     }
 
@@ -91,6 +84,7 @@ public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdap
         if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             fragmentManager.beginTransaction()
                     .replace(R.id.frameLayout, albumTracksFragment)
+                    .addToBackStack(null)
                     .commit();
         }
     }

@@ -1,12 +1,13 @@
 package com.white.streambeat.Activities;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,66 +29,37 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SetupArtistsActivity extends AppCompatActivity {
 
     ActivitySetupArtistsBinding binding;
     FirebaseUser firebaseUser;
     List<Artists> artistsList = new ArrayList<>();
-    SharedPreferences sharedPreferences;
-    private static final String PREF_DATA_FETCHED = "data_fetched";
     private SharedViewModel sharedViewModel;
     SetupArtistAdapter artistAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
         binding = ActivitySetupArtistsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
         binding.artistsRV.setLayoutManager(new LinearLayoutManager(this));
         artistAdapter = new SetupArtistAdapter(artistsList, this);
         binding.artistsRV.setAdapter(artistAdapter);
 
-        boolean dataFetched = sharedPreferences.getBoolean(PREF_DATA_FETCHED, false);
-        if (dataFetched) {
-            restoreArtistsDetailsFromSharedPreferences();
-        } else {
-            fetchAllArtists();
-        }
+        fetchAllArtists();
 
         sharedViewModel.getArtistList().observe(this, artists -> artistAdapter.updateData(artists));
 
         binding.btnContinue.setOnClickListener(v -> saveSelectedArtists());
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void restoreArtistsDetailsFromSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        String artistsJson = sharedPreferences.getString("artists_details", "");
-
-        if (!artistsJson.isEmpty()) {
-            try {
-                JSONArray artistsArray = new JSONArray(artistsJson);
-                artistsList.clear();
-                for (int i = 0; i < artistsArray.length(); i++) {
-                    JSONObject artistObj = artistsArray.getJSONObject(i);
-                    int artist_id = artistObj.getInt("artist_id");
-                    String artistName = artistObj.getString("artist_name");
-                    String image_url = artistObj.getString("image_url");
-                    artistsList.add(new Artists(artist_id, artistName, image_url));
-                }
-                artistAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                Toast.makeText(this, "Error restoring artists: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private void saveSelectedArtists() {
@@ -102,7 +74,6 @@ public class SetupArtistsActivity extends AppCompatActivity {
                     selectedArtistIds.add(artist.getArtist_id());
                 }
             }
-
             JSONArray jsonArray = new JSONArray(selectedArtistIds);
             JSONObject postData = new JSONObject();
 
@@ -140,50 +111,33 @@ public class SetupArtistsActivity extends AppCompatActivity {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
                 response -> {
+                    Log.d(TAG, "fetchAllArtists response: " + response); // Add logging
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.getJSONArray("response_artists");
+                        JSONArray jsonArray = jsonObject.getJSONArray("response_all_artists");
                         artistsList.clear();
-
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject artistObj = jsonArray.getJSONObject(i);
                             int artistId = artistObj.getInt("artist_id");
                             String artistName = artistObj.getString("artist_name");
                             String imageUrl = artistObj.getString("image_url");
-
                             Artists artist = new Artists(artistId, artistName, imageUrl);
                             artistsList.add(artist);
                         }
                         artistAdapter.notifyDataSetChanged();
-                        saveArtistsDetailsToSharedPreferences();
                         sharedViewModel.setArtistList(artistsList);
-
                     } catch (JSONException e) {
+                        Log.e(TAG, "JSON Error: " + e.getMessage()); // Add logging
                         Toast.makeText(SetupArtistsActivity.this, "JSON Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 },
-                error -> Toast.makeText(SetupArtistsActivity.this, "Error fetching artists: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                error -> {
+                    Log.e(TAG, "Error fetching artists: " + error.getMessage()); // Add logging
+                    Toast.makeText(SetupArtistsActivity.this, "Error fetching artists: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
         );
 
         Volley.newRequestQueue(this).add(stringRequest);
     }
-    private void saveArtistsDetailsToSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        JSONArray jsonArray = new JSONArray();
-        for (Artists artist : artistsList) {
-            JSONObject artistObj = new JSONObject();
-            try {
-                artistObj.put("artist_id", artist.getArtist_id());
-                artistObj.put("artist_name", artist.getArtist_name());
-                artistObj.put("image_url", artist.getImage_url());
-                jsonArray.put(artistObj);
-            } catch (JSONException e) {
-                Toast.makeText(this, "Error saving artists: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-        editor.putString("artists_details", jsonArray.toString());
-        editor.apply();
-    }
 }

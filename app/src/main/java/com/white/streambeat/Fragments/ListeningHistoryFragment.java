@@ -17,10 +17,10 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
-import com.white.streambeat.Adapters.UserLogsAdapter;
+import com.white.streambeat.Adapters.UserLogsAdapter; // Update this adapter to handle albums
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.SharedViewModel;
-import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
 import org.json.JSONArray;
@@ -40,15 +40,14 @@ public class ListeningHistoryFragment extends Fragment {
 
     private SharedViewModel sharedViewModel;
     private RecyclerView recyclerView;
-    private List<Tracks> allTracks = new ArrayList<>();
-    private UserLogsAdapter adapter;
-    private final Map<String, List<Tracks>> dateWithTracksMap = new HashMap<>();
+    private List<Albums> allAlbums = new ArrayList<>();
+    private UserLogsAdapter adapter; // Update this adapter to handle albums
+    private final Map<String, List<Albums>> dateWithAlbumsMap = new HashMap<>();
 
     @SuppressLint("ConstantLocale")
     private static final SimpleDateFormat INPUT_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     @SuppressLint("ConstantLocale")
     private static final SimpleDateFormat OUTPUT_FORMAT = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault());
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,17 +60,17 @@ public class ListeningHistoryFragment extends Fragment {
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        fetchAllTracks();
+        fetchAllAlbums();
         fetchUserLogs();
 
         return view;
     }
 
-    private void fetchAllTracks() {
-        sharedViewModel.getAllTracksList().observe(getViewLifecycleOwner(), tracks -> {
-            if (tracks != null) {
-                allTracks = new ArrayList<>(tracks);
-                filterTracksByDate();
+    private void fetchAllAlbums() {
+        sharedViewModel.getAllAlbumsList().observe(getViewLifecycleOwner(), albums -> {
+            if (albums != null) {
+                allAlbums = new ArrayList<>(albums);
+                filterAlbumsByDate();
             }
         });
     }
@@ -84,18 +83,19 @@ public class ListeningHistoryFragment extends Fragment {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray logsArray = jsonObject.getJSONArray("response_logs");
-                        List<Integer> trackIdsList = new ArrayList<>();
+                        List<Integer> albumIdsList = new ArrayList<>();
 
                         for (int i = 0; i < logsArray.length(); i++) {
                             JSONObject logObject = logsArray.getJSONObject(i);
                             String listenDate = logObject.getString("listen_date");
-                            JSONArray trackIdsArray = logObject.getJSONArray("track_ids");
+                            JSONArray albumIdsArray = logObject.getJSONArray("track_ids");
 
-                            for (int j = 0; j < trackIdsArray.length(); j++) {
-                                trackIdsList.add(trackIdsArray.getInt(j));
+                            for (int j = 0; j < albumIdsArray.length(); j++) {
+                                albumIdsList.add(albumIdsArray.getInt(j));
                             }
-                            sharedViewModel.setTrackIdsList(trackIdsList);
-                            filterTracksByDate(listenDate, trackIdsList);
+
+                            sharedViewModel.setAlbumIdsList(albumIdsList);
+                            filterAlbumsByDate(listenDate, albumIdsList);
                         }
 
                     } catch (Exception e) {
@@ -133,25 +133,25 @@ public class ListeningHistoryFragment extends Fragment {
         }
     }
 
-    private void filterTracksByDate(String listenDate, List<Integer> trackIdsFromHistory) {
-        List<Tracks> filteredTracks = allTracks.stream()
-                .filter(track -> trackIdsFromHistory.contains(track.getTrack_id()))
+    private void filterAlbumsByDate(String listenDate, List<Integer> albumIdsFromHistory) {
+        List<Albums> filteredAlbums = allAlbums.stream()
+                .filter(album -> albumIdsFromHistory.contains(album.getAlbum_id()))
                 .collect(Collectors.toList());
 
-        dateWithTracksMap.put(getDateLabel(listenDate), filteredTracks);
-        displayTracks();
+        dateWithAlbumsMap.put(getDateLabel(listenDate), filteredAlbums);
+        displayAlbums();
     }
 
-    private void filterTracksByDate() {
-        if (!dateWithTracksMap.isEmpty()) {
-            displayTracks();
+    private void filterAlbumsByDate() {
+        if (!dateWithAlbumsMap.isEmpty()) {
+            displayAlbums();
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void displayTracks() {
+    private void displayAlbums() {
         if (adapter == null) {
-            adapter = new UserLogsAdapter(getContext(), dateWithTracksMap);
+            adapter = new UserLogsAdapter(getContext(), dateWithAlbumsMap); // Update the adapter for albums
             recyclerView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();

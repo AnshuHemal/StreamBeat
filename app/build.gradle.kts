@@ -47,6 +47,7 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.4.1")
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.core:core:1.10.1")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

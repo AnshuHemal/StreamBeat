@@ -2,9 +2,6 @@ package com.white.streambeat.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,72 +51,41 @@ public class SetupArtistAdapter extends RecyclerView.Adapter<SetupArtistAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull SetupArtistAdapter.ViewHolder holder, int position) {
-        holder.bind(position);
+        Artists artist = artistsList.get(position);
+        holder.bind(artist);
     }
 
     @Override
     public int getItemCount() {
-        return (int) Math.ceil((double) artistsList.size() / 3);
+        return artistsList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout artist1Container, artist2Container, artist3Container;
-        CircleImageView artistImage1, artistImage2, artistImage3;
-        TextView artistName1, artistName2, artistName3;
-        CheckBox checkboxArtist1, checkboxArtist2, checkboxArtist3;
+        final LinearLayout artistContainer;
+        private final CircleImageView artistImage;
+        private final TextView artistName;
+        private final CheckBox checkboxArtist;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            artist1Container = itemView.findViewById(R.id.artist1_container);
-            artist2Container = itemView.findViewById(R.id.artist2_container);
-            artist3Container = itemView.findViewById(R.id.artist3_container);
-            artistImage1 = itemView.findViewById(R.id.artist_image1);
-            artistImage2 = itemView.findViewById(R.id.artist_image2);
-            artistImage3 = itemView.findViewById(R.id.artist_image3);
-
-            artistName1 = itemView.findViewById(R.id.artist_name1);
-            artistName2 = itemView.findViewById(R.id.artist_name2);
-            artistName3 = itemView.findViewById(R.id.artist_name3);
-
-            checkboxArtist1 = itemView.findViewById(R.id.checkbox_artist1);
-            checkboxArtist2 = itemView.findViewById(R.id.checkbox_artist2);
-            checkboxArtist3 = itemView.findViewById(R.id.checkbox_artist3);
-
-            // Set the tag to identify the ViewHolder in onClickListener
-            itemView.setTag(this);
-        }
-        public void bind(int position) {
-            int startIndex = position * 3;
-
-            bindArtist(artist1Container, artistName1, artistImage1, checkboxArtist1, startIndex);
-            bindArtist(artist2Container, artistName2, artistImage2, checkboxArtist2, startIndex + 1);
-            bindArtist(artist3Container, artistName3, artistImage3, checkboxArtist3, startIndex + 2);
+            artistContainer = itemView.findViewById(R.id.artist_container);
+            artistImage = itemView.findViewById(R.id.artist_image);
+            artistName = itemView.findViewById(R.id.artist_name);
+            checkboxArtist = itemView.findViewById(R.id.checkbox_artist);
         }
 
-        private void bindArtist(LinearLayout artistContainer, TextView artistName, CircleImageView artistImage,
-                                CheckBox checkboxArtist, int index) {
-            if (index < artistsList.size()) {
-                Artists artist = artistsList.get(index);
-                artistName.setText(artist.getArtist_name());
+        public void bind(Artists artist) {
+            artistName.setText(artist.getArtist_name());
 
-//                byte[] imageBytes = Base64.decode(artist.getImage_url(), Base64.DEFAULT);
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-//                artistImage.setImageBitmap(bitmap);
-                Picasso.get().load(artistsList.get(index).getImage_url()).into(artistImage);
+            Picasso.get().load(artist.getImage_url()).into(artistImage);
+            checkboxArtist.setChecked(artist.isSelected());
 
-                checkboxArtist.setChecked(artist.isSelected());
-                artistContainer.setVisibility(View.VISIBLE);
-
-                // Set click listener to handle checkbox selection
-                checkboxArtist.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    artist.setSelected(isChecked);
-                    updateSelectedArtists(artist, isChecked);
-                });
-            } else {
-                // Hide the container if no artist exists at this index
-                artistContainer.setVisibility(View.INVISIBLE);
-            }
+            // Set a listener to update the artist's selection state
+            checkboxArtist.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                artist.setSelected(isChecked);
+                updateSelectedArtists(artist, isChecked);
+            });
         }
 
         private void updateSelectedArtists(Artists artist, boolean isChecked) {

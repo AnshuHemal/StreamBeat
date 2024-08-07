@@ -16,14 +16,14 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<List<Object>> searchResults = new MutableLiveData<>();
     private final MutableLiveData<List<Artists>> favoriteArtistsList = new MutableLiveData<>();
     private final MutableLiveData<List<Artists>> filteredArtistsList = new MutableLiveData<>();
-    private final MutableLiveData<List<Integer>> trackIdsList = new MutableLiveData<>();
+    private final MutableLiveData<List<Integer>> albumIdsList = new MutableLiveData<>();
 
-    public LiveData<List<Integer>> getTrackIdsList() {
-        return trackIdsList;
+    public LiveData<List<Integer>> getAlbumIdsList() {
+        return albumIdsList;
     }
 
-    public void setTrackIdsList(List<Integer> trackIds) {
-        trackIdsList.setValue(trackIds);
+    public void setAlbumIdsList(List<Integer> albumIds) {
+        albumIdsList.setValue(albumIds);
     }
 
     public MutableLiveData<List<Artists>> getFavoriteArtistsList() {
@@ -80,6 +80,10 @@ public class SharedViewModel extends ViewModel {
 
     public MutableLiveData<List<Tracks>> getAllTracksList() {
         return allTracksList;
+    }
+
+    public MutableLiveData<List<Albums>> getAllAlbumsList() {
+        return allAlbumsList;
     }
 
     public MutableLiveData<List<Artists>> getArtistList() {

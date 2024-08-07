@@ -7,111 +7,34 @@
     android:padding="8dp">
 
     <LinearLayout
-        android:id="@+id/artist1_container"
-        android:layout_width="0dp"
+        android:id="@+id/artist_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingEnd="8dp">
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/artist_image1"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_ws" />
+            android:id="@+id/artist_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/img_ws"/>
 
         <TextView
-            android:id="@+id/artist_name1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:fontFamily="@font/quicksand_medium"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:text="Artist 1" />
-
-        <CheckBox
-            android:id="@+id/checkbox_artist1"
+            android:id="@+id/artist_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/artist2_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingEnd="8dp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/artist_image2"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_ws" />
-
-        <TextView
-            android:id="@+id/artist_name2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:text="Artist Name"
+            android:layout_marginStart="20dp"
             android:textSize="14sp"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
             android:textColor="@color/white"
-            android:fontFamily="@font/quicksand_medium"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:text="Artist 2" />
+            android:fontFamily="@font/mulish_medium"/>
 
         <CheckBox
-            android:id="@+id/checkbox_artist2"
+            android:id="@+id/checkbox_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
+            android:layout_marginStart="20dp"/>
 
-    <LinearLayout
-        android:id="@+id/artist3_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingEnd="8dp">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/artist_image3"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_ws" />
-
-        <TextView
-            android:id="@+id/artist_name3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:fontFamily="@font/quicksand_medium"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:text="Artist 3" />
-
-        <CheckBox
-            android:id="@+id/checkbox_artist3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"/>
     </LinearLayout>
 
 </LinearLayout>

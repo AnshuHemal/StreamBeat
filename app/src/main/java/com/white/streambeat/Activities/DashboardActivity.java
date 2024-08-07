@@ -14,7 +14,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -44,12 +44,13 @@ import androidx.palette.graphics.Palette;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Fragments.ExploreFragment;
@@ -299,7 +300,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         Bitmap bitmap = ((BitmapDrawable) miniPlayerImage.getDrawable()).getBitmap();
                         Palette.from(bitmap).generate(palette -> {
                             if (palette != null) {
-                                int dominantColor = palette.getDominantColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightGreen));
+                                int dominantColor = palette.getDarkMutedColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightGreen));
                                 ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), miniPlayerView.getSolidColor(), dominantColor);
                                 colorAnimation.setDuration(300); // milliseconds
                                 colorAnimation.addUpdateListener(animator -> miniPlayerView.setBackgroundColor((int) animator.getAnimatedValue()));
@@ -341,13 +342,11 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             mediaPlayer.pause();
             isPlaying = false;
             miniPlayerPlayPause.setImageResource(R.drawable.play_track);
-
-            runOnUiThread(() -> {
-                handler.removeCallbacks(updateProgressRunnable);
-            });
+            handler.removeCallbacks(updateProgressRunnable);
             showNotification();
         }
     }
+
 
     public void playTrack() {
         if (mediaPlayer != null && !isPlaying) {
@@ -383,26 +382,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         } else {
             Log.e("TrackPlayer", "Track list is null or empty.");
         }
-
-//        if (currentTrackPosition < tracksList.size() - 1) {
-//            currentTrackPosition++;
-//            Tracks nextTrack = tracksList.get(currentTrackPosition);
-//            playCurrentTrack();
-//            showMiniPlayer(nextTrack);
-//            showNotification();
-//            updateAlbumTracksAdapter();
-//            updateSearchAdapter();
-//        } else {
-//            currentTrackPosition = 0;
-//            Tracks nextTrack = tracksList.get(currentTrackPosition);
-//            playCurrentTrack();
-//            showMiniPlayer(nextTrack);
-//            showNotification();
-//            updateAlbumTracksAdapter();
-//            updateSearchAdapter();
-//        }
     }
-
 
     public void playPreviousTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
@@ -531,39 +511,33 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Intent previousIntent = new Intent(getApplicationContext(), NotificationReceiver.class).setAction("PREVIOUS");
         PendingIntent previousPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 2, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        Picasso.get().load(currentTrack.getTrack_image_url()).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        Glide.with(getApplicationContext())
+                .asBitmap()
+                .load(currentTrack.getTrack_image_url())
+                .override(800, 800)
+                .centerCrop()
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable com.bumptech.glide.request.transition.Transition<? super Bitmap> transition) {
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .setContentTitle(currentTrack.getTrack_name())
+                                .setContentText(String.join(", ", currentTrack.getArtist_names()))
+                                .setLargeIcon(resource)
+                                .addAction(R.drawable.previous_track, "Previous", previousPendingIntent)
+                                .addAction(isPlaying ? R.drawable.pause_track : R.drawable.play_track, "Play/Pause", playPausePendingIntent)
+                                .addAction(R.drawable.next_track, "Next", nextPendingIntent)
+                                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                                        .setMediaSession(mediaSession.getSessionToken())
+                                        .setShowActionsInCompactView(0, 1, 2))
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setOngoing(isPlaying)
+                                .setProgress(100, 50, false);
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle(currentTrack.getTrack_name())
-                        .setContentText(String.join(", ", currentTrack.getArtist_names()))
-                        .setLargeIcon(bitmap)
-                        .addAction(R.drawable.previous_track, "Previous", previousPendingIntent)
-                        .addAction(isPlaying ? R.drawable.pause_track : R.drawable.play_track, "Play/Pause", playPausePendingIntent)
-                        .addAction(R.drawable.next_track, "Next", nextPendingIntent)
-                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                                .setMediaSession(mediaSession.getSessionToken())
-                                .setShowActionsInCompactView(0, 1, 2))
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setOngoing(isPlaying)
-                        .setProgress(100, 50, false);
-
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-                notificationManager.notify(1, builder.build());
-            }
-
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                // Handle error
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                // Handle preparation
-            }
-        });
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                        notificationManager.notify(1, builder.build());
+                    }
+                });
     }
 
     @Override
@@ -676,5 +650,4 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(localReceiver);
     }
-
 }

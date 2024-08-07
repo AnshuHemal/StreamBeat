@@ -6,14 +6,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -30,10 +29,6 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.white.streambeat.Models.Tracks;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
     ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton;
@@ -45,6 +40,8 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
     Tracks track;
     Handler handler = new Handler();
     Runnable updateProgressRunnable;
+
+    int savedSeekBarPosition = -1;
 
     OnTrackControlListener trackControlListener;
 
@@ -131,17 +128,24 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
         });
 
-        updateUI();
+        updatePlayPauseButton();
+        updateProgress(trackControlListener.getCurrentPosition(), trackControlListener.getDuration());
 
         playPauseButton.setOnClickListener(v -> {
             if (trackControlListener != null) {
                 if (trackControlListener.isPlaying()) {
                     trackControlListener.pauseTrack();
+                    savedSeekBarPosition = seekBar.getProgress();
+                    Log.d("TrackPlayer", "Paused at position: " + savedSeekBarPosition);
                 } else {
                     trackControlListener.playTrack();
-                    seekBar.setProgress(trackControlListener.getCurrentPosition());
+                    if (savedSeekBarPosition != -1) {
+                        seekBar.setProgress(savedSeekBarPosition);
+                        Log.d("TrackPlayer", "Resumed at position: " + savedSeekBarPosition);
+                    }
                 }
-                updateUI();
+                updatePlayPauseButton();
+                updateProgress(trackControlListener.getCurrentPosition(), trackControlListener.getDuration());
             }
         });
 
@@ -211,9 +215,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                 }
             }
         };
-        if (handler != null) {
-            handler.post(updateProgressRunnable);
-        }
+        handler.post(updateProgressRunnable);
     }
 
     private void updatePlayPauseButton() {
@@ -248,15 +250,6 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         trackControlListener = null;
     }
 
-    private void updateUI() {
-        updatePlayPauseButton();
-        if (trackControlListener != null) {
-            int currentPosition = trackControlListener.getCurrentPosition();
-            int duration = trackControlListener.getDuration();
-            updateProgress(currentPosition, duration);
-        }
-    }
-
     private void updateTrackDetails() {
         if (trackControlListener != null) {
             Tracks track = trackControlListener.getCurrentTrack();
@@ -271,11 +264,11 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                                 Palette.from(bitmap).generate(palette -> {
                                     if (palette != null) {
                                         int[] colors = new int[]{
-                                                palette.getVibrantColor(ContextCompat.getColor(requireContext(), R.color.white)),
+                                                palette.getDarkVibrantColor(ContextCompat.getColor(requireContext(), R.color.white)),
                                                 palette.getDarkMutedColor(ContextCompat.getColor(requireContext(), R.color.darkTheme))
                                         };
                                         GradientDrawable gradientDrawable = new GradientDrawable(
-                                                GradientDrawable.Orientation.TOP_BOTTOM,
+                                                GradientDrawable.Orientation.TL_BR,
                                                 colors
                                         );
                                         sheetDialogMain.setBackground(gradientDrawable);
@@ -288,11 +281,16 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                                 sheetDialogMain.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darkTheme));
                             }
                         });
-                seekBar.setProgress(0); // Reset position if needed
-                updateProgress(0, trackControlListener.getDuration());
-//                updateUI();
+                int currentPosition = trackControlListener.getCurrentPosition();
+                int duration = trackControlListener.getDuration();
+                seekBar.setMax(duration);
+                if (savedSeekBarPosition != -1) {
+                    seekBar.setProgress(savedSeekBarPosition);
+                } else {
+                    seekBar.setProgress(currentPosition);
+                }
+                updateProgress(currentPosition, duration);
             }
         }
-
     }
 }

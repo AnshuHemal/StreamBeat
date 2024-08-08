@@ -55,23 +55,27 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:background="@drawable/button_bg_no_color"
                     android:id="@+id/cancelBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:textColor="@color/white"
                     android:layout_weight="1"
                     android:fontFamily="@font/quicksand_medium"
                     android:padding="15dp"
                     android:text="Cancel" />
 
                 <Button
+                    android:background="@drawable/button_bg"
                     android:id="@+id/yesLogoutBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_weight="1"
+                    android:textColor="@color/white"
                     android:fontFamily="@font/quicksand_medium"
                     android:padding="15dp"
                     android:text="Yes, Logout" />

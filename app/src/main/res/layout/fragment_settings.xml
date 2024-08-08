@@ -275,12 +275,13 @@
 
             <Button
                 android:id="@+id/btnLogout"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/edit_text_bg"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button_bg"
                 android:fontFamily="@font/mulish_medium"
+                android:textColor="@color/white"
                 android:text="Logout" />
 
         </LinearLayout>

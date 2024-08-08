@@ -9,8 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
@@ -20,7 +19,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.SetupArtistAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.Artists;
-import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.databinding.ActivitySetupArtistsBinding;
 
 import org.json.JSONArray;
@@ -36,7 +34,6 @@ public class SetupArtistsActivity extends AppCompatActivity {
     ActivitySetupArtistsBinding binding;
     FirebaseUser firebaseUser;
     List<Artists> artistsList = new ArrayList<>();
-    private SharedViewModel sharedViewModel;
     SetupArtistAdapter artistAdapter;
 
     @Override
@@ -47,17 +44,13 @@ public class SetupArtistsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        binding.artistsRV.setLayoutManager(new LinearLayoutManager(this));
+        binding.artistsRV.setLayoutManager(new GridLayoutManager(this, 3));
         artistAdapter = new SetupArtistAdapter(artistsList, this);
         binding.artistsRV.setAdapter(artistAdapter);
 
         fetchAllArtists();
-
-        sharedViewModel.getArtistList().observe(this, artists -> artistAdapter.updateData(artists));
 
         binding.btnContinue.setOnClickListener(v -> saveSelectedArtists());
     }
@@ -125,7 +118,6 @@ public class SetupArtistsActivity extends AppCompatActivity {
                             artistsList.add(artist);
                         }
                         artistAdapter.notifyDataSetChanged();
-                        sharedViewModel.setArtistList(artistsList);
                     } catch (JSONException e) {
                         Log.e(TAG, "JSON Error: " + e.getMessage()); // Add logging
                         Toast.makeText(SetupArtistsActivity.this, "JSON Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -139,5 +131,4 @@ public class SetupArtistsActivity extends AppCompatActivity {
 
         Volley.newRequestQueue(this).add(stringRequest);
     }
-
 }

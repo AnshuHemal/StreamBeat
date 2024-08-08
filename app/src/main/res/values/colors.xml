@@ -3,10 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFF</color>
 
-    <color name="primaryColor">#0E0E0E</color>
+    <color name="primaryColor">#141414</color>
 
-    <color name="darkTheme">#080808</color>
-    <color name="lightTheme">#0E0E0E</color>
+    <color name="darkTheme">#141414</color>
+    <color name="lightTheme">#141414</color>
     <color name="lightGreen">#34c759</color>
     <color name="lightWhite">#e5e5e5</color>
 </resources>

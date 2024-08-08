@@ -17,7 +17,7 @@
         <item name="fontFamily">@font/mulish_medium</item>
         <item name="android:textSize">12sp</item> <!-- Adjust the text size here -->
     </style>
-    
+
     <style name="CustomSeekBar" parent="Widget.AppCompat.SeekBar">
         <item name="android:progressBackgroundTint">#43B0B0B0</item>
         <item name="android:progressTint">@color/white</item>

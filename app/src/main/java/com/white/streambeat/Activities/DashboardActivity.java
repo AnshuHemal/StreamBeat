@@ -190,7 +190,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         miniPlayerView.setOnClickListener(v -> {
             if (currentTrack != null) {
                 TrackPlayerSheetFragment trackPlayerSheetFragment = new TrackPlayerSheetFragment(currentTrack);
-                trackPlayerSheetFragment.show(getSupportFragmentManager(), trackPlayerSheetFragment.getTag());
+                trackPlayerSheetFragment.show(getSupportFragmentManager(), "TrackPlayerSheetFragment");
                 trackPlayerSheetFragment.setUpdateProgressRunnable();
             }
         });

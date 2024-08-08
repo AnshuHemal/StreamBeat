@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.palette.graphics.Palette;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -92,8 +94,9 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         arrowDownButton.setOnClickListener(v -> dismiss());
 
         btnMoreOptions.setOnClickListener(v -> {
+//            dismissAllBottomSheets();
             TrackMoreOptionsSheetFragment moreOptionsSheetFragment = new TrackMoreOptionsSheetFragment(track);
-            moreOptionsSheetFragment.show(getChildFragmentManager(), moreOptionsSheetFragment.getTag());
+            moreOptionsSheetFragment.show(getParentFragmentManager(), "TrackMoreOptionsSheetFragment");
         });
 
         updateTrackDetails();
@@ -299,4 +302,15 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
             }
         }
     }
+    public void dismissAllBottomSheets() {
+        FragmentManager fragmentManager = getParentFragmentManager(); // Ensure using the correct FragmentManager
+        if (fragmentManager != null) {
+            for (Fragment fragment : fragmentManager.getFragments()) {
+                if (fragment instanceof BottomSheetDialogFragment) {
+                    ((BottomSheetDialogFragment) fragment).dismiss();
+                }
+            }
+        }
+    }
+
 }

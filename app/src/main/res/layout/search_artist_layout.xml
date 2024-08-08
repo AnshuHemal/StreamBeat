@@ -33,7 +33,7 @@
                 android:id="@+id/artistSearchName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Track Name"
+                android:text="Artist Name"
                 android:maxLines="1"
                 android:textColor="@color/white"
                 android:textStyle="bold"
@@ -57,13 +57,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/btnPlayPause"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/dots"
-            app:tint="@color/white"/>
 
     </LinearLayout>
 

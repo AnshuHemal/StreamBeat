@@ -1,0 +1,69 @@
+package com.white.streambeat;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.white.streambeat.Adapters.ArtistAdapter;
+import com.white.streambeat.Models.Artists;
+import com.white.streambeat.Models.SharedViewModel;
+import com.white.streambeat.Models.Tracks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TrackViewArtistsSheetFragment extends BottomSheetDialogFragment {
+
+    Tracks tracks;
+    SharedViewModel sharedViewModel;
+    List<Artists> selectedArtists = new ArrayList<>();
+
+    public TrackViewArtistsSheetFragment(Tracks tracks) {
+        this.tracks = tracks;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.track_view_artists_sheet, container, false);
+
+        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+
+        RecyclerView artistsRecyclerView = view.findViewById(R.id.artistsRecyclerView);
+        artistsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        if (tracks != null && tracks.getArtist_names() != null) {
+            List<Artists> artistsList = sharedViewModel.getArtistList().getValue();
+
+            if (artistsList != null) {
+                for (Artists artist : artistsList) {
+                    if (artist != null && artist.getArtist_name() != null) {
+                        for (String artistName : tracks.getArtist_names()) {
+                            if (artist.getArtist_name().equals(artistName)) {
+                                selectedArtists.add(artist);
+                                break;
+                            }
+                        }
+                    }
+                }
+                ArtistAdapter adapter = new ArtistAdapter(getContext(), selectedArtists);
+                artistsRecyclerView.setAdapter(adapter);
+            } else {
+                Log.e("TrackViewArtists", "Artists list from ViewModel is null.");
+            }
+        } else {
+            Log.e("TrackViewArtists", "Tracks or artist names are null.");
+        }
+
+        return view;
+    }
+}

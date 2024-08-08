@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
@@ -65,8 +67,12 @@ public class AlbumTracksFragment extends Fragment {
 
         assert getArguments() != null;
         albumTitle = getArguments().getString("album_title", "");
-        albumCoverImageUrl = getArguments().getString("album_image_url", "");
-        Picasso.get().load(albumCoverImageUrl).into(albumImage);
+        for (Albums album : sharedViewModel.getAllAlbumsList().getValue()) {
+            if (album.getAlbum_title().equals(albumTitle)) {
+                albumCoverImageUrl = album.getCover_image_url();
+            }
+        }
+        Glide.with(view).load(albumCoverImageUrl).into(albumImage);
         txtAlbumTitle.setText(albumTitle);
         fetchUsersLikedTracks();
 

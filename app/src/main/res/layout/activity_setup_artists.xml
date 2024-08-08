@@ -41,8 +41,9 @@
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="10dp"
-        android:backgroundTint="@color/lightGreen"
-        android:fontFamily="@font/quicksand_medium"
+        android:background="@drawable/button_bg"
+        android:fontFamily="@font/mulish_medium"
+        android:textColor="@color/white"
         android:padding="16dp"
         android:text="CONTINUE" />
 

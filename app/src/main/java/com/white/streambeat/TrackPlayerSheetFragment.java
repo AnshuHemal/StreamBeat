@@ -31,7 +31,7 @@ import com.white.streambeat.Models.Tracks;
 
 public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
 
-    ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton;
+    ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton, btnMoreOptions;
     TextView trackName, artistNames, currentTime, totalTime;
     AppCompatSeekBar seekBar;
     FloatingActionButton playPauseButton;
@@ -80,6 +80,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         playPauseButton = view.findViewById(R.id.playPauseButton);
         playNextTrack = view.findViewById(R.id.playNextTrack);
         playPreviousTrack = view.findViewById(R.id.playPreviousTrack);
+        btnMoreOptions = view.findViewById(R.id.btnMoreOption);
         trackName = view.findViewById(R.id.trackTSName);
         artistNames = view.findViewById(R.id.trackTSArtistName);
         currentTime = view.findViewById(R.id.currentTimeTxt);
@@ -89,6 +90,11 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         arrowDownButton = view.findViewById(R.id.arrowDownBtn);
 
         arrowDownButton.setOnClickListener(v -> dismiss());
+
+        btnMoreOptions.setOnClickListener(v -> {
+            TrackMoreOptionsSheetFragment moreOptionsSheetFragment = new TrackMoreOptionsSheetFragment(track);
+            moreOptionsSheetFragment.show(getChildFragmentManager(), moreOptionsSheetFragment.getTag());
+        });
 
         updateTrackDetails();
 

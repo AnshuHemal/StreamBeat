@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
@@ -77,6 +77,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 viewHolder = new TrackViewHolder(view);
                 break;
         }
+        assert viewHolder != null;
         return viewHolder;
     }
 
@@ -108,7 +109,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
         }
         holder.trackArtists.setText(artistsBuilder.toString());
-        Picasso.get().load(track.getTrack_image_url()).into(holder.trackImage);
+        Glide.with(context).load(track.getTrack_image_url()).into(holder.trackImage);
 
         if (track.isLikedByUser()) {
             holder.trackBtnLike.setImageResource(R.drawable.added);
@@ -137,7 +138,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private void configureAlbumViewHolder(AlbumViewHolder holder, Albums album) {
         holder.albumName.setText(album.getAlbum_title());
-        Picasso.get().load(album.getCover_image_url()).into(holder.albumCover);
+        Glide.with(context).load(album.getCover_image_url()).into(holder.albumCover);
 
         holder.itemView.setOnClickListener(v -> {
             int adapterPosition = holder.getAdapterPosition();
@@ -153,7 +154,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private void configureArtistViewHolder(ArtistViewHolder holder, Artists artist) {
         holder.artistName.setText(artist.getArtist_name());
-        Picasso.get().load(artist.getImage_url()).into(holder.artistImage);
+        Glide.with(context).load(artist.getImage_url()).into(holder.artistImage);
 
         // Set click listener
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -26,7 +26,7 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
         this.track = track;
     }
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,6 +39,7 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
         if (track != null) {
             Glide.with(view).load(track.getTrack_image_url()).into(sheetTrackImage);
             sheetTrackName.setText(track.getTrack_name());
+            sheetAlbumName.setText(track.getArtist_names().get(0) + " • " + track.getAlbum_title());
         }
 
         return view;

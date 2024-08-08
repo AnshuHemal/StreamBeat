@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.SearchAdapter;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
@@ -42,15 +43,19 @@ public class ExploreFragment extends Fragment {
     private RecyclerView recyclerViewSearchResults;
     private SearchAdapter searchAdapter;
     private List<Object> searchResults;
-    private EditText searchView;
+    EditText searchView;
     private LinearLayout no_keyword_found;
     FirebaseUser firebaseUser;
-    private List<Integer> likedTracksIds;
+    List<Integer> likedTracksIds;
+
+    LoadingDialog dialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
+
+        dialog = new LoadingDialog(requireContext());
 
         FragmentManager fragmentManager = getParentFragmentManager();
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -88,25 +93,6 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        // Observe search results from ViewModel
-        sharedViewModel.getSearchResults().observe(getViewLifecycleOwner(), objects -> {
-            if (objects != null) {
-                searchAdapter.updateData(objects);
-                Log.d("ExploreFragment", "Search results updated: " + searchResults.size() + " items");
-
-                if (searchResults.isEmpty()) {
-                    no_keyword_found.setVisibility(View.GONE);
-                    recyclerViewSearchResults.setVisibility(View.GONE);
-                } else {
-                    recyclerViewSearchResults.setVisibility(View.VISIBLE);
-                    no_keyword_found.setVisibility(View.GONE);
-                }
-            } else {
-                no_keyword_found.setVisibility(View.GONE);
-                recyclerViewSearchResults.setVisibility(View.INVISIBLE);
-            }
-        });
-
         return view;
     }
 
@@ -114,9 +100,29 @@ public class ExploreFragment extends Fragment {
         if (query.isEmpty()) {
             sharedViewModel.clearSearchResults();
         } else {
+            dialog.show();
             // Trigger search in sharedViewModel
             sharedViewModel.search(query);
             Log.d("ExploreFragment", "Performing search with query: " + query);
+
+            sharedViewModel.getSearchResults().observe(getViewLifecycleOwner(), objects -> {
+                if (objects != null) {
+                    searchAdapter.updateData(objects);
+                    Log.d("ExploreFragment", "Search results updated: " + searchResults.size() + " items");
+                    dialog.dismiss();
+                    if (searchResults.isEmpty()) {
+                        no_keyword_found.setVisibility(View.GONE);
+                        recyclerViewSearchResults.setVisibility(View.GONE);
+                    } else {
+                        recyclerViewSearchResults.setVisibility(View.VISIBLE);
+                        no_keyword_found.setVisibility(View.GONE);
+                    }
+                } else {
+                    dialog.dismiss();
+                    no_keyword_found.setVisibility(View.GONE);
+                    recyclerViewSearchResults.setVisibility(View.INVISIBLE);
+                }
+            });
         }
     }
 
@@ -127,10 +133,12 @@ public class ExploreFragment extends Fragment {
     }
 
     public void fetchUsersLikedTracks() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.FETCH_USERS_LIKED_TRACKS,
                 response -> {
+                    dialog.dismiss();
                     try {
                         JSONArray jsonArray = new JSONArray(response);
                         likedTracksIds = new ArrayList<>();
@@ -150,7 +158,10 @@ public class ExploreFragment extends Fragment {
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        }
         ) {
             @Override
             protected Map<String, String> getParams() {

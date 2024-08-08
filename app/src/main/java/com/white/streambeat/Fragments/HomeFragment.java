@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.FavArtistsAdapter;
 import com.white.streambeat.Adapters.PopularAlbumsAdapter;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.SharedViewModel;
@@ -60,6 +61,10 @@ public class HomeFragment extends Fragment {
     List<Albums> allAlbums = new ArrayList<>();
     List<Tracks> allTracks = new ArrayList<>();
 
+    LoadingDialog dialog;
+    private int fetchCount = 0;
+    final int TOTAL_FETCHES = 5;
+
     FavArtistsAdapter favArtistsAdapter;
     PopularAlbumsAdapter albumsAdapter;
 
@@ -76,6 +81,9 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        dialog = new LoadingDialog(requireContext());
+        fetchCount = 0;
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
@@ -95,8 +103,9 @@ public class HomeFragment extends Fragment {
         fetchAllArtists();
         fetchAllAlbums();
         fetchAllTracks();
-//        fetchPopularAlbums();
         fetchUserInfo();
+        fetchFavoriteArtists();
+        fetchPopularAlbums();
 
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         artists = new ArrayList<>();
@@ -122,6 +131,7 @@ public class HomeFragment extends Fragment {
             fetchAllAlbums();
             fetchAllTracks();
             fetchPopularAlbums();
+            fetchFavoriteArtists();
             fetchUserInfo();
         }
 
@@ -196,10 +206,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchUserInfo() {
+        dialog.show();
         @SuppressLint("SetTextI18n") StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.GETUSERINFO_URL,
                 response -> {
+                    dialog.dismiss();
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_obj");
@@ -213,8 +225,13 @@ public class HomeFragment extends Fragment {
                         saveUserInfoToSharedPreferences(unameTxt.getText().toString());
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
         ) {
             @Override
             protected Map<String, String> getParams() {
@@ -227,6 +244,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchAllArtists() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
@@ -252,13 +270,19 @@ public class HomeFragment extends Fragment {
 
                     } catch (Exception e) {
                         Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
                     }
-                }, error -> Toast.makeText(requireContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+            Toast.makeText(requireContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
         );
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 
     private void fetchAllAlbums() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ALBUMS_DETAILS,
@@ -287,13 +311,19 @@ public class HomeFragment extends Fragment {
 
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
         );
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 
     private void fetchAllTracks() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.GET_ALL_TRACKS_DETAILS,
@@ -335,18 +365,23 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(getContext(), "JSON Parsing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
                     }
                 },
                 error -> {
                     Log.e(TAG, "Volley Error: ", error); // Log error details
                     Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    onFetchComplete();
                 }
-        ){};
+        ) {
+        };
 
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 
     private void fetchPopularAlbums() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.GET_POPULAR_ALBUMS,
@@ -372,9 +407,14 @@ public class HomeFragment extends Fragment {
                         } catch (Exception e) {
                             unameTxt.setText(e.getMessage());
                             Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            onFetchComplete();
                         }
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
         ) {
             @Override
             protected Map<String, String> getParams() {
@@ -403,62 +443,68 @@ public class HomeFragment extends Fragment {
         sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
     }
 
-//    private void fetchFavoriteArtists() {
-//        StringRequest stringRequest = new StringRequest(
-//                Request.Method.POST,
-//                ServerConnector.GET_SELECTED_ARTISTS,
-//                new Response.Listener<String>() {
-//                    @SuppressLint("NotifyDataSetChanged")
-//                    @Override
-//                    public void onResponse(String response) {
-//                        try {
-//                            artists.clear();
-//                            JSONObject j = new JSONObject(response);
-//                            JSONArray jsonArray = j.getJSONArray("response_artists");
-//                            for (int i = 0; i < jsonArray.length(); i++) {
-//                                JSONObject artistObj = jsonArray.getJSONObject(i);
-//
-//                                int artist_id = artistObj.getInt("artist_id");
-//                                String artistName = artistObj.getString("artist_name");
-//                                String image_url = artistObj.getString("image_url");
-//
-//                                artists.add(new Artists(artist_id, artistName, image_url));
-//                            }
-//                            favArtistsAdapter.notifyDataSetChanged();
-//                            saveArtistsListToSharedPreferences();
-//                        } catch (Exception e) {
-//                            unameTxt.setText(e.getMessage());
-//                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
-//        ) {
-//            @Override
-//            protected Map<String, String> getParams() {
-//                HashMap<String, String> hm = new HashMap<>();
-//                hm.put("key_phone", firebaseUser.getPhoneNumber());
-//                return hm;
-//            }
-//        };
-//        Volley.newRequestQueue(requireContext()).add(stringRequest);
-//    }
+    private void fetchFavoriteArtists() {
+        dialog.show();
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_SELECTED_ARTISTS,
+                new Response.Listener<String>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            artists.clear();
+                            JSONObject j = new JSONObject(response);
+                            JSONArray jsonArray = j.getJSONArray("response_artists");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
 
-//    private void saveArtistsListToSharedPreferences() {
-//        JSONArray jsonArray = new JSONArray();
-//        for (Artists artist : artists) {
-//            JSONObject artistObj = new JSONObject();
-//            try {
-//                artistObj.put("artist_id", artist.getArtist_id());
-//                artistObj.put("artist_name", artist.getArtist_name());
-//                artistObj.put("image_url", artist.getImage_url());
-//                jsonArray.put(artistObj);
-//            } catch (JSONException e) {
-//                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//        sharedPreferences.edit().putString("artists_list", jsonArray.toString()).apply();
-//        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
-//    }
+                                int artist_id = artistObj.getInt("artist_id");
+                                String artistName = artistObj.getString("artist_name");
+                                String image_url = artistObj.getString("image_url");
+
+                                artists.add(new Artists(artist_id, artistName, image_url));
+                            }
+                            favArtistsAdapter.notifyDataSetChanged();
+                            saveArtistsListToSharedPreferences();
+                        } catch (Exception e) {
+                            unameTxt.setText(e.getMessage());
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            onFetchComplete();
+                        }
+                    }
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("key_phone", firebaseUser.getPhoneNumber());
+                return hm;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void saveArtistsListToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Artists artist : artists) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("artist_id", artist.getArtist_id());
+                artistObj.put("artist_name", artist.getArtist_name());
+                artistObj.put("image_url", artist.getImage_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("artists_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
+    }
 
     private void saveArtistsDetailsToSharedPreferences() {
         JSONArray jsonArray = new JSONArray();
@@ -514,5 +560,12 @@ public class HomeFragment extends Fragment {
             }
         }
         sharedPreferences.edit().putString("all_tracks_details", jsonArray.toString()).apply();
+    }
+
+    private void onFetchComplete() {
+        fetchCount++;
+        if (fetchCount >= TOTAL_FETCHES) {
+            dialog.dismiss();
+        }
     }
 }

@@ -57,6 +57,7 @@ import com.white.streambeat.Fragments.ExploreFragment;
 import com.white.streambeat.Fragments.HomeFragment;
 import com.white.streambeat.Fragments.LibraryFragment;
 import com.white.streambeat.Fragments.ProfileFragment;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.NotificationReceiver;
@@ -84,6 +85,8 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     View miniPlayerView;
     TextView miniPlayerTitle, miniPlayerArtistsNames;
     ImageView miniPlayerPlayPause, miniPlayerShuffle, miniPlayerImage;
+
+    LoadingDialog dialog;
 
     MediaSessionCompat mediaSession;
     private static final String CHANNEL_ID = "music_channel";
@@ -139,6 +142,8 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Objects.requireNonNull(getSupportActionBar()).hide();
+
+        dialog = new LoadingDialog(this);
 
         requestNotificationPermission();
 

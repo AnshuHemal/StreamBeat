@@ -21,6 +21,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.R;
 import com.white.streambeat.databinding.ActivitySignUpBinding;
 
@@ -37,6 +38,7 @@ public class SignUpActivity extends AppCompatActivity {
     ActivitySignUpBinding binding;
     FirebaseUser firebaseUser;
     DatePickerDialog.OnDateSetListener dateSetListener;
+    LoadingDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,8 @@ public class SignUpActivity extends AppCompatActivity {
         binding = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+
+        dialog = new LoadingDialog(this);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -71,17 +75,23 @@ public class SignUpActivity extends AppCompatActivity {
 
         binding.agreeAndContinueBtn.setOnClickListener(v -> {
             if (checkUtilsAreFillOrNot()) {
+                dialog.show();
                 StringRequest stringRequest = new StringRequest(
                         Request.Method.POST,
                         ServerConnector.REGISTER_URL,
                         response -> {
                             if (response.equals("Success")) {
+                                dialog.dismiss();
                                 startActivity(new Intent(getApplicationContext(), SetupArtistsActivity.class));
                                 finish();
                             } else {
+                                dialog.dismiss();
                                 showSnackbar(response);
                             }
-                        }, error -> showSnackbar(error.getMessage())
+                        }, error -> {
+                    dialog.dismiss();
+                    showSnackbar(error.getMessage());
+                }
                 ) {
                     @Override
                     protected Map<String, String> getParams() {
@@ -100,6 +110,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
     }
+
     public boolean checkUtilsAreFillOrNot() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date dateOfBirth = null;

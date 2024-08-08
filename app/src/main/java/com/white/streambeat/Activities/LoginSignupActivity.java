@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.R;
 import com.white.streambeat.databinding.ActivityLoginSignupBinding;
 
@@ -37,6 +38,8 @@ public class LoginSignupActivity extends AppCompatActivity {
     PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
 
+    LoadingDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,8 @@ public class LoginSignupActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
 
+        dialog = new LoadingDialog(this);
+
         auth = FirebaseAuth.getInstance();
 
         binding.btnContinue.setOnClickListener(v -> {
@@ -52,6 +57,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                 if (checkUtilsAreFillOrNot()) {
                     phone = binding.ccp.getSelectedCountryCodeWithPlus() + binding.phoneNumber.getText().toString();
                     startPhoneNumberVerification(phone);
+                    showDialog();
                 }
             } else {
                 String otp = binding.etCode.getText().toString();
@@ -68,11 +74,13 @@ public class LoginSignupActivity extends AppCompatActivity {
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                hideDialog();
                 signInWithPhoneAuthCredential(phoneAuthCredential);
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
+                hideDialog();
                 showSnackbar(e.getMessage());
             }
 
@@ -86,6 +94,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                 binding.ccp.setEnabled(false);
                 binding.phoneNumber.setEnabled(false);
                 binding.btnContinue.setText("Verify Code");
+                hideDialog();
                 showSnackbar("Code Sent to : " + phone);
             }
         };
@@ -94,6 +103,7 @@ public class LoginSignupActivity extends AppCompatActivity {
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
+                    showDialog();
                     if (task.isSuccessful()) {
                         firebaseUser = task.getResult().getUser();
 
@@ -102,9 +112,11 @@ public class LoginSignupActivity extends AppCompatActivity {
                                 ServerConnector.LOGIN_URL,
                                 response -> {
                                     if (response.equals("Success")){
+                                        hideDialog();
                                         startActivity(new Intent(getApplicationContext(), DashboardActivity.class));
                                         finish();
                                     } else {
+                                        hideDialog();
                                         startActivity(new Intent(LoginSignupActivity.this, SignUpActivity.class));
                                         showSnackbar(phone + " is Verified..");
                                         finish();
@@ -150,7 +162,28 @@ public class LoginSignupActivity extends AppCompatActivity {
     }
 
     public void showSnackbar(String message) {
-        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_SHORT).show();
+        runOnUiThread(() -> {
+            if (!isFinishing()) {
+                Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    private void showDialog() {
+        runOnUiThread(() -> {
+            if (!isFinishing() && !dialog.isShowing()) {
+                dialog.show();
+            }
+        });
+    }
+
+    private void hideDialog() {
+        runOnUiThread(() -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        });
+    }
+
 
 }

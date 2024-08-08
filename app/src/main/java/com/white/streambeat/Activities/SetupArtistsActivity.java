@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.SetupArtistAdapter;
 import com.white.streambeat.Connections.ServerConnector;
+import com.white.streambeat.LoadingDialog;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.databinding.ActivitySetupArtistsBinding;
 
@@ -35,6 +36,7 @@ public class SetupArtistsActivity extends AppCompatActivity {
     FirebaseUser firebaseUser;
     List<Artists> artistsList = new ArrayList<>();
     SetupArtistAdapter artistAdapter;
+    LoadingDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class SetupArtistsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+        dialog = new LoadingDialog(this);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         binding.artistsRV.setLayoutManager(new GridLayoutManager(this, 3));
@@ -77,13 +80,19 @@ public class SetupArtistsActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
+            dialog.show();
+
             StringRequest stringRequest = new StringRequest(
                     Request.Method.POST,
                     ServerConnector.SAVE_SELECTED_ARTIST,
                     response -> {
+                        dialog.dismiss();
                         startActivity(new Intent(getApplicationContext(), DashboardActivity.class));
                         finish();
-                    }, error -> Toast.makeText(SetupArtistsActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                    }, error -> {
+                dialog.dismiss();
+                Toast.makeText(SetupArtistsActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
             ) {
                 @Override
                 public byte[] getBody() {
@@ -100,11 +109,13 @@ public class SetupArtistsActivity extends AppCompatActivity {
     }
 
     public void fetchAllArtists() {
+        dialog.show();
         @SuppressLint("NotifyDataSetChanged") StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
                 response -> {
                     Log.d(TAG, "fetchAllArtists response: " + response); // Add logging
+                    dialog.dismiss();
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_artists");
@@ -125,6 +136,7 @@ public class SetupArtistsActivity extends AppCompatActivity {
                 },
                 error -> {
                     Log.e(TAG, "Error fetching artists: " + error.getMessage()); // Add logging
+                    dialog.dismiss();
                     Toast.makeText(SetupArtistsActivity.this, "Error fetching artists: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
         );

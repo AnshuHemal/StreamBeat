@@ -69,6 +69,7 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/likeSongsCountTxt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/mulish_medium"

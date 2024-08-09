@@ -1,9 +1,9 @@
 package com.white.streambeat.Connections;
 
 import com.white.streambeat.Models.Artists;
+import com.white.streambeat.Models.Tracks;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class ServerConnector {
@@ -25,7 +25,10 @@ public class ServerConnector {
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";
     public static String SAVE_USER_LOGS = serverUrl + "save_user_logs";
     public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
+    public static String GET_LIKED_SONGS_COUNT = serverUrl + "get_liked_songs_count";
 
     public static List<Artists> artists = new ArrayList<>();
     public static List<Artists> favoriteArtists = new ArrayList<>();
+    public static int likedSongsCount = 0;
+    public static List<Tracks> likedTracksList = new ArrayList<>();
 }

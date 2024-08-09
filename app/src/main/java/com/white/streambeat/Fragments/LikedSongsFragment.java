@@ -16,34 +16,22 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.SharedViewModel;
-import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
-
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class LikedSongsFragment extends Fragment {
 
     RecyclerView rvLikedSongs;
-    private TracksAdapter tracksAdapter;
+    TracksAdapter tracksAdapter;
     FirebaseUser firebaseUser;
-    private List<Integer> likedTracksIds;
     SharedViewModel sharedViewModel;
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,68 +58,9 @@ public class LikedSongsFragment extends Fragment {
             },100);
         });
 
-        fetchUsersLikedTracks();
-
-        sharedViewModel.getAllTracksList().observe(getViewLifecycleOwner(), tracks -> {
-            if (tracks != null) {
-                fetchUsersLikedTracks();
-            }
-        });
+        tracksAdapter.setTracksList(ServerConnector.likedTracksList);
+        tracksAdapter.notifyDataSetChanged();
 
         return view;
-    }
-
-    public void fetchUsersLikedTracks() {
-        StringRequest stringRequest = new StringRequest(
-                Request.Method.POST,
-                ServerConnector.FETCH_USERS_LIKED_TRACKS,
-                response -> {
-                    try {
-                        JSONArray jsonArray = new JSONArray(response);
-                        likedTracksIds = new ArrayList<>();
-
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            int trackId = jsonArray.getJSONObject(i).getInt("track_id");
-                            likedTracksIds.add(trackId);
-
-                            for (Tracks track : sharedViewModel.getAllTracksList().getValue()) {
-                                if (track.getTrack_id() == trackId) {
-                                    track.setLikedByUser(true);
-                                }
-                            }
-                        }
-                        displayLikedTracks();
-
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_phone", firebaseUser.getPhoneNumber());
-                return map;
-            }
-        };
-        Volley.newRequestQueue(requireContext()).add(stringRequest);
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void displayLikedTracks() {
-        List<Tracks> likedTracks = new ArrayList<>();
-
-        List<Tracks> allTracks = sharedViewModel.getAllTracksList().getValue();
-
-        if (allTracks != null) {
-            for (Tracks track : allTracks) {
-                if (likedTracksIds.contains(track.getTrack_id())) {
-                    likedTracks.add(track);
-                }
-            }
-        }
-
-        tracksAdapter.setTracksList(likedTracks);
-        tracksAdapter.notifyDataSetChanged();
     }
 }

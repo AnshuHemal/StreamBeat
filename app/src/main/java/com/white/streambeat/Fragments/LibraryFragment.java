@@ -1,5 +1,6 @@
 package com.white.streambeat.Fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.white.streambeat.Adapters.ArtistAdapter;
 import com.white.streambeat.Connections.ServerConnector;
@@ -21,7 +23,9 @@ import com.white.streambeat.R;
 
 public class LibraryFragment extends Fragment {
     LinearLayout llLikedSongs;
+    TextView likeSongsCountTxt;
 
+    @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -29,11 +33,14 @@ public class LibraryFragment extends Fragment {
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
         llLikedSongs = view.findViewById(R.id.llLikedSongs);
+        likeSongsCountTxt = view.findViewById(R.id.likeSongsCountTxt);
         RecyclerView artistsRecyclerView = view.findViewById(R.id.selectedArtistsRV);
         artistsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         ArtistAdapter adapter = new ArtistAdapter(getContext(), ServerConnector.favoriteArtists);
         artistsRecyclerView.setAdapter(adapter);
+
+        likeSongsCountTxt.setText(ServerConnector.likedSongsCount + " songs");
 
         llLikedSongs.setOnClickListener(v -> {
             v.startAnimation(animation);

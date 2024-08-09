@@ -60,6 +60,7 @@ public class HomeFragment extends Fragment {
     List<Artists> allArtists = new ArrayList<>();
     List<Albums> allAlbums = new ArrayList<>();
     List<Tracks> allTracks = new ArrayList<>();
+    List<Integer> likedTracksIds = new ArrayList<>();
 
     LoadingDialog dialog;
     private int fetchCount = 0;
@@ -105,6 +106,8 @@ public class HomeFragment extends Fragment {
         fetchAllTracks();
         fetchUserInfo();
         fetchFavoriteArtists();
+        fetchLikedSongsCount();
+        fetchUsersLikedTracks();
 //        fetchPopularAlbums();
 
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -476,6 +479,86 @@ public class HomeFragment extends Fragment {
             }
         };
         Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void fetchLikedSongsCount() {
+        ServerConnector.likedSongsCount = 0;
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_LIKED_SONGS_COUNT,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        ServerConnector.likedSongsCount = jsonObject.getInt("liked_tracks_count");
+                    } catch (Exception e) {
+                        Log.d(TAG, "fetchLikedSongsCount: " + e.getMessage());
+                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("key_phone", firebaseUser.getPhoneNumber());
+                return hashMap;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    public void fetchUsersLikedTracks() {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.FETCH_USERS_LIKED_TRACKS,
+                response -> {
+                    ServerConnector.likedTracksList.clear();
+                    likedTracksIds.clear();
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            int trackId = jsonArray.getJSONObject(i).getInt("track_id");
+                            likedTracksIds.add(trackId);
+
+                            for (Tracks track : Objects.requireNonNull(sharedViewModel.getAllTracksList().getValue())) {
+                                if (track.getTrack_id() == trackId) {
+                                    track.setLikedByUser(true);
+                                }
+                            }
+                        }
+                        storeLikedTracksToServerConnector();
+
+                    } catch (Exception e) {
+                        Log.d(TAG, "fetchUsersLikedTracks: " + e.getMessage());
+                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("user_phone", firebaseUser.getPhoneNumber());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void storeLikedTracksToServerConnector() {
+        List<Tracks> allTracks = sharedViewModel.getAllTracksList().getValue();
+        if (ServerConnector.likedTracksList == null) {
+            ServerConnector.likedTracksList = new ArrayList<>();
+        } else {
+            ServerConnector.likedTracksList.clear(); // Clear the list if already initialized
+        }
+        if (allTracks != null) {
+            for (Tracks track : allTracks) {
+                if (likedTracksIds.contains(track.getTrack_id())) {
+                    ServerConnector.likedTracksList.add(track);
+                }
+            }
+        }
     }
 
     private void saveAlbumsToSharedPreferences() {

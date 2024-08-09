@@ -3,6 +3,7 @@ package com.white.streambeat.Connections;
 import com.white.streambeat.Models.Artists;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ServerConnector {
@@ -26,4 +27,5 @@ public class ServerConnector {
     public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
 
     public static List<Artists> artists = new ArrayList<>();
+    public static List<Artists> favoriteArtists = new ArrayList<>();
 }

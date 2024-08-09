@@ -265,6 +265,7 @@ public class HomeFragment extends Fragment {
                                 allArtists.add(artists);
                             }
                             saveArtistsDetailsToSharedPreferences();
+                            ServerConnector.artists.clear();
                             ServerConnector.artists.addAll(allArtists);
                             sharedViewModel.setAllArtistsList(allArtists);
                         }
@@ -427,23 +428,6 @@ public class HomeFragment extends Fragment {
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 
-    private void saveAlbumsToSharedPreferences() {
-        JSONArray jsonArray = new JSONArray();
-        for (Albums artist : popularAlbums) {
-            JSONObject artistObj = new JSONObject();
-            try {
-                artistObj.put("album_id", artist.getAlbum_id());
-                artistObj.put("album_title", artist.getAlbum_id());
-                artistObj.put("cover_image_url", artist.getCover_image_url());
-                jsonArray.put(artistObj);
-            } catch (JSONException e) {
-                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-        sharedPreferences.edit().putString("popular_albums_list", jsonArray.toString()).apply();
-        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
-    }
-
     private void fetchFavoriteArtists() {
         dialog.show();
         StringRequest stringRequest = new StringRequest(
@@ -464,8 +448,13 @@ public class HomeFragment extends Fragment {
                                 String artistName = artistObj.getString("artist_name");
                                 String image_url = artistObj.getString("image_url");
 
-                                artists.add(new Artists(artist_id, artistName, image_url));
+                                Artists artist = new Artists(artist_id, artistName, image_url);
+                                if (!artists.contains(artist)) {
+                                    artists.add(new Artists(artist_id, artistName, image_url));
+                                }
                             }
+                            ServerConnector.favoriteArtists.clear();
+                            ServerConnector.favoriteArtists.addAll(artists);
                             favArtistsAdapter.notifyDataSetChanged();
                             saveArtistsListToSharedPreferences();
                         } catch (Exception e) {
@@ -488,6 +477,23 @@ public class HomeFragment extends Fragment {
             }
         };
         Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void saveAlbumsToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Albums artist : popularAlbums) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("album_id", artist.getAlbum_id());
+                artistObj.put("album_title", artist.getAlbum_id());
+                artistObj.put("cover_image_url", artist.getCover_image_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("popular_albums_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
     }
 
     private void saveArtistsListToSharedPreferences() {

@@ -13,7 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.R;
 
@@ -41,7 +41,7 @@ public class FavArtistsAdapter extends RecyclerView.Adapter<FavArtistsAdapter.Vi
     public void onBindViewHolder(@NonNull FavArtistsAdapter.ViewHolder holder, int position) {
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
         holder.homeArtistName.setText(artistsList.get(position).getArtist_name());
-        Picasso.get().load(artistsList.get(position).getImage_url()).into(holder.homeArtistImage);
+        Glide.with(context).load(artistsList.get(position).getImage_url()).into(holder.homeArtistImage);
         holder.homeArtistLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -70,7 +70,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class DashboardActivity extends AppCompatActivity implements TrackPlayerSheetFragment.OnTrackControlListener {
+public class DashboardActivity extends AppCompatActivity implements TrackPlayerSheetFragment.OnTrackControlListener, TrackPlayerSheetFragment.OnTrackUpdateListener {
 
     ActivityDashboardBinding binding;
     FrameLayout frameLayout;
@@ -97,7 +97,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     private int currentTrackPosition = -1;
     String bluetoothDevice = "";
 
-    public void onLikeButtonClick(Tracks track, String phoneNumber) {
+    public void addToLikedSongs(Tracks track, String phoneNumber) {
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.STORE_LIKED_TRACKS,
@@ -108,6 +108,23 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                 HashMap<String, String> map = new HashMap<>();
                 map.put("user_phone", phoneNumber);
                 map.put("track_name", track.getTrack_name());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
+    }
+
+    public void removeFromLikedSongs(Tracks tracks, String phoneNumber) {
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.REMOVE_LIKED_TRACKS,
+                response -> Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show(), error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("user_phone", phoneNumber);
+                map.put("track_name", tracks.getTrack_name());
                 return map;
             }
         };
@@ -291,6 +308,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
+        updateIconLikedTracks(tracks);
 
         Picasso.get().load(tracks.getTrack_image_url())
                 .into(miniPlayerImage, new Callback() {
@@ -323,9 +341,32 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         }
         miniPlayerArtistsNames.setText(artistsBuilder.toString());
         miniPlayerView.setVisibility(View.VISIBLE);
+        updateIconLikedTracks(tracks);
 
         miniPlayerPlayPause.setOnClickListener(v -> togglePlayback());
-        miniPlayerShuffle.setOnClickListener(v -> playNextTrack());
+        miniPlayerShuffle.setOnClickListener(v -> {
+            if (!tracks.isLikedByUser()) {
+                addToLikedSongs(tracks, firebaseUser.getPhoneNumber());
+                tracks.setLikedByUser(true);
+                miniPlayerShuffle.setImageResource(R.drawable.added);
+                miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.lightGreen));
+            } else {
+                removeFromLikedSongs(tracks, firebaseUser.getPhoneNumber());
+                tracks.setLikedByUser(false);
+                miniPlayerShuffle.setImageResource(R.drawable.add_to_liked_songs);
+                miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
+            }
+        });
+    }
+
+    public void updateIconLikedTracks(Tracks tracks) {
+        if (tracks.isLikedByUser()) {
+            miniPlayerShuffle.setImageResource(R.drawable.added);
+            miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.lightGreen));
+        } else {
+            miniPlayerShuffle.setImageResource(R.drawable.add_to_liked_songs);
+            miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        }
     }
 
     public void togglePlayback() {
@@ -611,5 +652,10 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(localReceiver);
+    }
+
+    @Override
+    public void onTrackUpdated(Tracks updatedTrack) {
+        showMiniPlayer(updatedTrack);
     }
 }

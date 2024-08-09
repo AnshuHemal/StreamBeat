@@ -20,6 +20,7 @@ public class ServerConnector {
     public static String GET_ALL_ALBUMS_DETAILS = serverUrl + "get_all_albums_details";
     public static String GET_ALL_TRACKS_DETAILS = serverUrl + "get_all_tracks_details";
     public static String STORE_LIKED_TRACKS = serverUrl + "store_liked_tracks";
+    public static String REMOVE_LIKED_TRACKS = serverUrl + "remove_liked_tracks";
     public static String FETCH_USERS_LIKED_TRACKS = serverUrl + "fetch_users_liked_tracks";
     public static String GET_POPULAR_ALBUMS = serverUrl + "get_popular_albums";
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";

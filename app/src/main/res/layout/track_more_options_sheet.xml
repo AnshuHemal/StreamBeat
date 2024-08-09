@@ -61,6 +61,7 @@
             android:background="#232222" />
 
         <LinearLayout
+            android:id="@+id/likeTrackBtnMoreSheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -73,6 +74,7 @@
                 android:src="@drawable/img_ws" />
 
             <TextView
+                android:id="@+id/txtLikeTrackMoreSheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"

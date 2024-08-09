@@ -19,16 +19,22 @@ import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Tracks;
+
+import java.util.Objects;
 
 public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
 
     private static final String ARG_TRACK = "track";
     Tracks track;
-    TextView sheetTrackName, sheetAlbumName;
+    TextView sheetTrackName, sheetAlbumName, txtLikeTrackMoreSheet;
     ImageView sheetTrackImage;
-    LinearLayout sheetViewAlbumLL, sheetViewArtistsLL;
+    LinearLayout sheetViewAlbumLL, sheetViewArtistsLL, likeTrackBtnMoreSheet;
+
+    private OnTrackUpdateListener trackUpdateListener;
 
     public TrackMoreOptionsSheetFragment(Tracks track) {
         this.track = track;
@@ -54,12 +60,15 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
         sheetAlbumName = view.findViewById(R.id.sheetAlbumName);
         sheetViewAlbumLL = view.findViewById(R.id.sheetViewAlbumLL);
         sheetViewArtistsLL = view.findViewById(R.id.sheetViewArtistsLL);
+        likeTrackBtnMoreSheet = view.findViewById(R.id.likeTrackBtnMoreSheet);
+        txtLikeTrackMoreSheet = view.findViewById(R.id.txtLikeTrackMoreSheet);
 
         if (getArguments() != null) {
-            track = getArguments().getParcelable(ARG_TRACK);  // Use Parcelable if possible
+            track = getArguments().getParcelable(ARG_TRACK);
         }
 
         if (track != null) {
+            updateTextLikedTrack();
             Glide.with(view).load(track.getTrack_image_url()).into(sheetTrackImage);
             sheetTrackName.setText(track.getTrack_name());
             sheetAlbumName.setText(track.getArtist_names().get(0) + " • " + track.getAlbum_title());
@@ -76,9 +85,35 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
                 v.startAnimation(animation);
                 new Handler().postDelayed(() -> navigateToArtistSheetFragment(track), 100);
             });
+
+            likeTrackBtnMoreSheet.setOnClickListener(v -> {
+                v.startAnimation(animation);
+                new Handler().postDelayed(() -> {
+                    if (!track.isLikedByUser()) {
+                        ((DashboardActivity) requireContext()).addToLikedSongs(track, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
+                        track.setLikedByUser(true);
+                        updateTextLikedTrack();
+                        notifyTrackUpdated();
+                    } else {
+                        ((DashboardActivity) requireContext()).removeFromLikedSongs(track, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
+                        track.setLikedByUser(false);
+                        updateTextLikedTrack();
+                        notifyTrackUpdated();
+                    }
+                }, 100);
+            });
         }
 
         return view;
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateTextLikedTrack() {
+        if (track.isLikedByUser()) {
+            txtLikeTrackMoreSheet.setText("Remove from Liked Songs");
+        } else {
+            txtLikeTrackMoreSheet.setText("Add to Liked Songs");
+        }
     }
 
     private void navigateToArtistSheetFragment(Tracks track) {
@@ -113,5 +148,18 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
                 ((BottomSheetDialogFragment) fragment).dismiss();
             }
         }
+    }
+    public void setOnTrackUpdateListener(OnTrackUpdateListener listener) {
+        this.trackUpdateListener = listener;
+    }
+
+    private void notifyTrackUpdated() {
+        if (trackUpdateListener != null) {
+            trackUpdateListener.onTrackUpdated(track);
+        }
+    }
+
+    public interface OnTrackUpdateListener {
+        void onTrackUpdated(Tracks updatedTrack);
     }
 }

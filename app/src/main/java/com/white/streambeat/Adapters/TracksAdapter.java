@@ -94,8 +94,13 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         });
 
         holder.trackLikeBtn.setOnClickListener(v -> {
-            ((DashboardActivity) context).onLikeButtonClick(tracksList.get(position), firebaseUser.getPhoneNumber());
-            notifyDataSetChanged();
+            if (!tracksList.get(position).isLikedByUser()) {
+                ((DashboardActivity) context).addToLikedSongs(tracksList.get(position), firebaseUser.getPhoneNumber());
+                notifyDataSetChanged();
+            } else {
+                ((DashboardActivity) context).removeFromLikedSongs(tracksList.get(position), firebaseUser.getPhoneNumber());
+                notifyDataSetChanged();
+            }
         });
 
         holder.btnMoreOptions.setOnClickListener(v -> {

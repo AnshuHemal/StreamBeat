@@ -1,5 +1,6 @@
 package com.white.streambeat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -25,13 +26,17 @@ import androidx.palette.graphics.Palette;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Models.Tracks;
 
-public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
+import java.util.Objects;
 
-    ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton, btnMoreOptions;
+public class TrackPlayerSheetFragment extends BottomSheetDialogFragment implements TrackMoreOptionsSheetFragment.OnTrackUpdateListener{
+
+    ImageView trackImage, playNextTrack, playPreviousTrack, arrowDownButton, btnMoreOptions, btnLike;
     TextView trackName, artistNames, currentTime, totalTime;
     AppCompatSeekBar seekBar;
     FloatingActionButton playPauseButton;
@@ -44,33 +49,38 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
     int savedSeekBarPosition = -1;
 
     OnTrackControlListener trackControlListener;
+    OnTrackUpdateListener trackUpdateListener;
+
+    @Override
+    public void onTrackUpdated(Tracks updatedTrack) {
+        if (track != null && track.getTrack_id() == (updatedTrack.getTrack_id())) {
+            track = updatedTrack;
+            updateTrackDetails();
+        }
+    }
 
     public interface OnTrackControlListener {
         void playNextTrack();
-
         void playPreviousTrack();
-
         void playTrack();
-
         void pauseTrack();
-
         int getCurrentPosition();
-
         int getDuration();
-
         boolean isPlaying();
-
         void seekTo(int position);
-
         Tracks getCurrentTrack();
-
         int getRemainingDuration();
+    }
+
+    public interface OnTrackUpdateListener {
+        void onTrackUpdated(Tracks updatedTrack);
     }
 
     public TrackPlayerSheetFragment(Tracks track) {
         this.track = track;
     }
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -88,14 +98,24 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         seekBar = view.findViewById(R.id.seekBar);
         sheetDialogMain = view.findViewById(R.id.sheetDialogMain);
         arrowDownButton = view.findViewById(R.id.arrowDownBtn);
+        btnLike = view.findViewById(R.id.likeBtnSheet);
 
         arrowDownButton.setOnClickListener(v -> dismiss());
 
         btnMoreOptions.setOnClickListener(v -> {
-//            dismissAllBottomSheets();
+            TrackPlayerSheetFragment trackPlayerSheetFragment = new TrackPlayerSheetFragment(track);
             TrackMoreOptionsSheetFragment moreOptionsSheetFragment = new TrackMoreOptionsSheetFragment(track);
+            moreOptionsSheetFragment.setOnTrackUpdateListener(trackPlayerSheetFragment);
             moreOptionsSheetFragment.show(getParentFragmentManager(), "TrackMoreOptionsSheetFragment");
         });
+
+        if (track.isLikedByUser()) {
+            btnLike.setImageResource(R.drawable.added);
+            btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.lightGreen));
+        } else {
+            btnLike.setImageResource(R.drawable.add_to_liked_songs);
+            btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.white));
+        }
 
         updateTrackDetails();
 
@@ -118,6 +138,21 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 setUpdateProgressRunnable();
             }
+        });
+
+        btnLike.setOnClickListener(v -> {
+            if (!track.isLikedByUser()) {
+                ((DashboardActivity) requireContext()).addToLikedSongs(track, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
+                track.setLikedByUser(true);
+                btnLike.setImageResource(R.drawable.added);
+                btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.lightGreen));
+            } else {
+                ((DashboardActivity) requireContext()).removeFromLikedSongs(track, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
+                track.setLikedByUser(false);
+                btnLike.setImageResource(R.drawable.add_to_liked_songs);
+                btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.white));
+            }
+            notifyTrackUpdated();
         });
 
         playNextTrack.setOnClickListener(v -> {
@@ -249,18 +284,37 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
         } else {
             throw new ClassCastException(context + " must implement OnTrackControlListener");
         }
+        if (context instanceof OnTrackUpdateListener) {
+            trackUpdateListener = (OnTrackUpdateListener) context;
+        } else {
+            throw new ClassCastException(context + " must implement OnTrackUpdateListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         trackControlListener = null;
+        trackUpdateListener = null;
+    }
+
+    private void notifyTrackUpdated() {
+        if (trackUpdateListener != null) {
+            trackUpdateListener.onTrackUpdated(track);
+        }
     }
 
     private void updateTrackDetails() {
         if (trackControlListener != null) {
             Tracks track = trackControlListener.getCurrentTrack();
             if (track != null) {
+                if (track.isLikedByUser()) {
+                    btnLike.setImageResource(R.drawable.added);
+                    btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.lightGreen));
+                } else {
+                    btnLike.setImageResource(R.drawable.add_to_liked_songs);
+                    btnLike.setColorFilter(ContextCompat.getColor(requireContext(), R.color.white));
+                }
                 trackName.setText(track.getTrack_name());
                 artistNames.setText(TextUtils.join(", ", track.getArtist_names()));
                 Picasso.get().load(track.getTrack_image_url())

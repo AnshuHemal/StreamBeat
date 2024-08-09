@@ -1,5 +1,10 @@
 package com.white.streambeat.Connections;
 
+import com.white.streambeat.Models.Artists;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ServerConnector {
     public static String serverUrl = "https://anantpolymers.com/StreamBeat/sb_users.php/";
     public static String LOGIN_URL = serverUrl + "login";
@@ -19,4 +24,6 @@ public class ServerConnector {
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";
     public static String SAVE_USER_LOGS = serverUrl + "save_user_logs";
     public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
+
+    public static List<Artists> artists = new ArrayList<>();
 }

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.white.streambeat.Adapters.ArtistAdapter;
+import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
@@ -42,7 +43,7 @@ public class TrackViewArtistsSheetFragment extends BottomSheetDialogFragment {
         artistsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if (tracks != null && tracks.getArtist_names() != null) {
-            List<Artists> artistsList = sharedViewModel.getArtistList().getValue();
+            List<Artists> artistsList = ServerConnector.artists;
 
             if (artistsList != null) {
                 for (Artists artist : artistsList) {
@@ -50,7 +51,6 @@ public class TrackViewArtistsSheetFragment extends BottomSheetDialogFragment {
                         for (String artistName : tracks.getArtist_names()) {
                             if (artist.getArtist_name().equals(artistName)) {
                                 selectedArtists.add(artist);
-                                break;
                             }
                         }
                     }

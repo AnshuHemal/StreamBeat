@@ -265,6 +265,7 @@ public class HomeFragment extends Fragment {
                                 allArtists.add(artists);
                             }
                             saveArtistsDetailsToSharedPreferences();
+                            ServerConnector.artists.addAll(allArtists);
                             sharedViewModel.setAllArtistsList(allArtists);
                         }
 

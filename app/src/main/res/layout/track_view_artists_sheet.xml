@@ -6,6 +6,17 @@
     android:background="@color/lightTheme"
     android:padding="16dp">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="Artists"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:fontFamily="@font/mulish_medium"
+        android:layout_marginBottom="5dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/artistsRecyclerView"
         android:layout_width="match_parent"

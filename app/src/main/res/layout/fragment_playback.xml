@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBackPB"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="#FFFFFF" />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="Playback"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -67,7 +67,7 @@
                         android:text="Crossfade"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -76,7 +76,7 @@
                         android:text="Allows you to crossfade between songs"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                     <LinearLayout
                         android:layout_marginTop="20dp"
@@ -91,7 +91,7 @@
                             android:text="0 s"
                             android:fontFamily="@font/mulish_light"
                             android:textColor="#E5E5E5"
-                            android:textSize="13sp"/>
+                            android:textSize="14sp"/>
 
                         <androidx.appcompat.widget.AppCompatSeekBar
                             android:id="@+id/seekBar"
@@ -110,7 +110,7 @@
                             android:text="12 s"
                             android:fontFamily="@font/mulish_light"
                             android:textColor="#E5E5E5"
-                            android:textSize="13sp"/>
+                            android:textSize="14sp"/>
 
                     </LinearLayout>
 
@@ -138,7 +138,7 @@
                         android:text="Gapless"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -147,7 +147,7 @@
                         android:text="Allows gapless playback"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
@@ -179,7 +179,7 @@
                         android:text="Automix"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -188,7 +188,7 @@
                         android:text="Allow seamless transitions between songs on select playlists"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
@@ -220,7 +220,7 @@
                         android:text="Normalize Volume"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -229,7 +229,7 @@
                         android:text="Set the same volume level for all tracks"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
@@ -261,7 +261,7 @@
                         android:text="Mono Audio"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -270,7 +270,7 @@
                         android:text="Makes the left and right speakers play the same audio"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
@@ -302,7 +302,7 @@
                         android:text="Device Broadcast Status"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -311,7 +311,7 @@
                         android:text="Allow other apps on your device to see what you are listening to"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
@@ -343,7 +343,7 @@
                         android:text="Autoplay Similar Content"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -352,7 +352,7 @@
                         android:text="Enjoy nonstop listening. We'll play something similar when what you're listening to ends."
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 

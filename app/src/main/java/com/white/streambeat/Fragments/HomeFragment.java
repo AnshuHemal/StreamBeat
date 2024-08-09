@@ -214,6 +214,8 @@ public class HomeFragment extends Fragment {
                 ServerConnector.GETUSERINFO_URL,
                 response -> {
                     dialog.dismiss();
+                    ServerConnector.userFullName = null;
+                    ServerConnector.userEmailAddress = null;
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_obj");
@@ -222,7 +224,10 @@ public class HomeFragment extends Fragment {
                             JSONObject j1 = jsonArray.getJSONObject(i);
                             String fname = j1.optString("fname");
                             String lname = j1.optString("lname");
+                            String email = j1.optString("email");
                             unameTxt.setText(fname + " " + lname);
+                            ServerConnector.userFullName = fname + " " + lname;
+                            ServerConnector.userEmailAddress = email;
                         }
                         saveUserInfoToSharedPreferences(unameTxt.getText().toString());
                     } catch (Exception e) {

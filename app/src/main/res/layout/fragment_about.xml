@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBackAbout"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="@color/white" />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="About"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -67,7 +67,7 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Version"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_weight="1"
@@ -77,7 +77,7 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="1.0.0"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -99,7 +99,7 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Third-party licences"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -121,11 +121,11 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Terms of Use"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/redirect"
                     app:tint="#FFFFFF" />
 
@@ -149,11 +149,11 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Privacy Policy"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/redirect"
                     app:tint="#FFFFFF"  />
 
@@ -177,11 +177,11 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Platform Rules"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/redirect"
                     app:tint="#FFFFFF"  />
 
@@ -205,11 +205,11 @@
                     android:fontFamily="@font/mulish_medium"
                     android:text="Support"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/redirect"
                     app:tint="#FFFFFF"  />
 

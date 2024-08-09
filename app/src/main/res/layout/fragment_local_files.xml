@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBackLF"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="#FFFFFF" />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="Local Files"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -67,7 +67,7 @@
                         android:text="Show audio files from this device"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -76,7 +76,7 @@
                         android:text="Add tracks from this device into Your Library"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 

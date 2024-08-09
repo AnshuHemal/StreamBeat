@@ -101,7 +101,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.STORE_LIKED_TRACKS,
-                response -> Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show(), error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                response -> {}/*Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show()*/, error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
         ) {
             @Override
             protected Map<String, String> getParams() {
@@ -118,7 +118,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.REMOVE_LIKED_TRACKS,
-                response -> Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show(), error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                response -> {}/*Toast.makeText(DashboardActivity.this, response, Toast.LENGTH_SHORT).show()*/, error -> Toast.makeText(DashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
         ) {
             @Override
             protected Map<String, String> getParams() {

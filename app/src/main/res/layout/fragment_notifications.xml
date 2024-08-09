@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBackNoti"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="#FFFFFF" />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="Notifications"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -68,7 +68,7 @@
                         android:text="Recommended Music"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -77,13 +77,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -108,7 +108,7 @@
                         android:text="Audiobooks"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -117,13 +117,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -148,7 +148,7 @@
                         android:text="Playlist Updates"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -157,13 +157,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -188,7 +188,7 @@
                         android:text="Artist Updates"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -197,13 +197,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -228,7 +228,7 @@
                         android:text="StreamBeat Offers &amp; Bundles"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -237,13 +237,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -268,7 +268,7 @@
                         android:text="StreamBeat Features &amp; Tips"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -277,13 +277,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -308,7 +308,7 @@
                         android:text="StreamBeat Experiences Made for You"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -317,13 +317,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -348,7 +348,7 @@
                         android:text="News &amp; Cultural Moments"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -357,13 +357,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 
@@ -388,7 +388,7 @@
                         android:text="Surveys"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_medium"
-                        android:textSize="15sp"/>
+                        android:textSize="16sp"/>
 
                     <TextView
                         android:layout_marginTop="5dp"
@@ -397,13 +397,13 @@
                         android:text="Push, Email"
                         android:fontFamily="@font/mulish_light"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp"/>
+                        android:textSize="13sp"/>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"/>
 

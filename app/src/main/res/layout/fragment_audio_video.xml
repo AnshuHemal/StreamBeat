@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBackAudioVideo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="#FFFFFF"  />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="Audio &amp; Video"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -57,7 +57,7 @@
                 android:fontFamily="@font/mulish_medium"
                 android:text="Audio Quality"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="17sp" />
 
             <View
                 android:layout_width="match_parent"
@@ -85,7 +85,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Wi-Fi Streaming"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -94,13 +94,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="High"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"  />
 
@@ -125,7 +125,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Data Cellular Streaming"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -134,13 +134,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="Automatic"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF"  />
 
@@ -165,7 +165,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Auto Adjust Quality"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -196,7 +196,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Download"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -205,13 +205,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="Medium"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF" />
 
@@ -236,7 +236,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Download using Cellular"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -245,7 +245,7 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="Recommended Setting: Off"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
@@ -276,7 +276,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Equalizer"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -285,13 +285,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="Open the equalizer control panel."
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF" />
 
@@ -312,7 +312,7 @@
                 android:fontFamily="@font/mulish_medium"
                 android:text="Video Quality"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="17sp" />
 
             <View
                 android:layout_width="match_parent"
@@ -340,7 +340,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Wi-Fi Streaming"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -349,13 +349,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="High"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF" />
 
@@ -380,7 +380,7 @@
                         android:fontFamily="@font/mulish_medium"
                         android:text="Data Cellular Streaming"
                         android:textColor="@color/white"
-                        android:textSize="15sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -389,13 +389,13 @@
                         android:fontFamily="@font/mulish_light"
                         android:text="Automatic"
                         android:textColor="#E5E5E5"
-                        android:textSize="11sp" />
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/right_arrow"
                     app:tint="#FFFFFF" />
 

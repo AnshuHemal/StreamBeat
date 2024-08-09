@@ -28,6 +28,8 @@ public class ServerConnector {
     public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
     public static String GET_LIKED_SONGS_COUNT = serverUrl + "get_liked_songs_count";
 
+    public static String userFullName = "";
+    public static String userEmailAddress = "";
     public static List<Artists> artists = new ArrayList<>();
     public static List<Artists> favoriteArtists = new ArrayList<>();
     public static int likedSongsCount = 0;

@@ -52,7 +52,7 @@
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:padding="5dp"
-                    android:src="@drawable/img_ws" />
+                    android:src="@drawable/liked_img" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

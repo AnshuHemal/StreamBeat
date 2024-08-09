@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:padding="10dp"
             android:src="@drawable/arrow_left"
             app:tint="#FFFFFF" />
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:text="Settings"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -61,8 +61,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/profile1"
                     app:tint="#FFFFFF" />
 
@@ -73,7 +73,7 @@
                     android:paddingStart="20dp"
                     android:text="Account"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -89,8 +89,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/notification_bell"
                     app:tint="#FFFFFF" />
 
@@ -101,7 +101,7 @@
                     android:paddingStart="20dp"
                     android:text="Notification"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -117,8 +117,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/audio"
                     app:tint="#FFFFFF" />
 
@@ -129,7 +129,7 @@
                     android:paddingStart="20dp"
                     android:text="Audio and Video"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -145,8 +145,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/playback"
                     app:tint="#FFFFFF" />
 
@@ -157,7 +157,7 @@
                     android:paddingStart="20dp"
                     android:text="Playback"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -173,8 +173,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/data_saver"
                     app:tint="#FFFFFF" />
 
@@ -185,7 +185,7 @@
                     android:paddingStart="20dp"
                     android:text="Data Saver &amp; Storage"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -201,8 +201,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/local_files"
                     app:tint="#FFFFFF" />
 
@@ -213,7 +213,7 @@
                     android:paddingStart="20dp"
                     android:text="Local Files"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -229,8 +229,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/advertisements"
                     app:tint="#FFFFFF"/>
 
@@ -241,7 +241,7 @@
                     android:paddingStart="20dp"
                     android:text="Advertisements"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -257,8 +257,8 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
                     android:src="@drawable/about"
                     app:tint="#FFFFFF" />
 
@@ -269,7 +269,7 @@
                     android:paddingStart="20dp"
                     android:text="About"
                     android:textColor="@color/white"
-                    android:textSize="15sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 

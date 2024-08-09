@@ -71,7 +71,7 @@
             <ImageView
                 android:layout_width="27dp"
                 android:layout_height="27dp"
-                android:src="@drawable/img_ws" />
+                android:src="@drawable/liked_img" />
 
             <TextView
                 android:id="@+id/txtLikeTrackMoreSheet"

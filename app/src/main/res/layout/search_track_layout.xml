@@ -90,7 +90,7 @@
             app:tint="@color/white"/>
 
         <ImageView
-            android:id="@+id/btnPlayPause"
+            android:id="@+id/btnMoreOptions"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/dots"

@@ -24,6 +24,7 @@ import com.white.streambeat.Models.Tracks;
 
 public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
 
+    private static final String ARG_TRACK = "track";
     Tracks track;
     TextView sheetTrackName, sheetAlbumName;
     ImageView sheetTrackImage;
@@ -31,6 +32,14 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
 
     public TrackMoreOptionsSheetFragment(Tracks track) {
         this.track = track;
+    }
+
+    public static TrackMoreOptionsSheetFragment newInstance(Tracks track) {
+        TrackMoreOptionsSheetFragment fragment = new TrackMoreOptionsSheetFragment(track);
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_TRACK, track);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @SuppressLint({"MissingInflatedId", "SetTextI18n"})
@@ -45,6 +54,10 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
         sheetAlbumName = view.findViewById(R.id.sheetAlbumName);
         sheetViewAlbumLL = view.findViewById(R.id.sheetViewAlbumLL);
         sheetViewArtistsLL = view.findViewById(R.id.sheetViewArtistsLL);
+
+        if (getArguments() != null) {
+            track = getArguments().getParcelable(ARG_TRACK);  // Use Parcelable if possible
+        }
 
         if (track != null) {
             Glide.with(view).load(track.getTrack_image_url()).into(sheetTrackImage);
@@ -70,11 +83,9 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
 
     private void navigateToArtistSheetFragment(Tracks track) {
         FragmentManager fragmentManager = getParentFragmentManager();
-        if (fragmentManager != null) {
-            for (Fragment fragment : fragmentManager.getFragments()) {
-                if (fragment instanceof TrackMoreOptionsSheetFragment) {
-                    ((BottomSheetDialogFragment) fragment).dismiss();
-                }
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            if (fragment instanceof TrackMoreOptionsSheetFragment) {
+                ((BottomSheetDialogFragment) fragment).dismiss();
             }
         }
         TrackViewArtistsSheetFragment artistsSheetFragment = new TrackViewArtistsSheetFragment(track);
@@ -97,11 +108,9 @@ public class TrackMoreOptionsSheetFragment extends BottomSheetDialogFragment {
 
     public void closeAllBottomSheets() {
         FragmentManager fragmentManager = getParentFragmentManager();
-        if (fragmentManager != null) {
-            for (Fragment fragment : fragmentManager.getFragments()) {
-                if (fragment instanceof BottomSheetDialogFragment) {
-                    ((BottomSheetDialogFragment) fragment).dismiss();
-                }
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            if (fragment instanceof BottomSheetDialogFragment) {
+                ((BottomSheetDialogFragment) fragment).dismiss();
             }
         }
     }

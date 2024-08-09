@@ -6,10 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import com.white.streambeat.Activities.DashboardActivity;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
+import com.white.streambeat.TrackMoreOptionsSheetFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +86,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
         }
 
-        holder.itemView.setOnClickListener(v -> {
+        holder.llSearchItem.setOnClickListener(v -> {
             if (position != currentlyPlayingPosition) {
                 ((DashboardActivity) context).playTracks(tracksList, position);
                 setCurrentlyPlayingPosition(position);
@@ -93,6 +97,17 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
             ((DashboardActivity) context).onLikeButtonClick(tracksList.get(position), firebaseUser.getPhoneNumber());
             notifyDataSetChanged();
         });
+
+        holder.btnMoreOptions.setOnClickListener(v -> {
+            TrackMoreOptionsSheetFragment optionsFragment = TrackMoreOptionsSheetFragment.newInstance(tracksList.get(position));
+            if (context instanceof AppCompatActivity) {
+                AppCompatActivity activity = (AppCompatActivity) context;
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                optionsFragment.show(fragmentManager, optionsFragment.getTag());
+            } else {
+                throw new IllegalStateException("Context must be an instance of AppCompatActivity");
+            }
+        });
     }
 
     @Override
@@ -102,15 +117,18 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView trackName, trackArtists;
-        ImageView trackImage, trackLikeBtn;
+        ImageView trackImage, trackLikeBtn, btnMoreOptions;
+        LinearLayout llSearchItem;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            llSearchItem = itemView.findViewById(R.id.llSearchItem);
             trackName = itemView.findViewById(R.id.trackSearchName);
             trackArtists = itemView.findViewById(R.id.trackSearchArtistsName);
             trackImage = itemView.findViewById(R.id.trackSearchImage);
             trackLikeBtn = itemView.findViewById(R.id.btnLike);
+            btnMoreOptions = itemView.findViewById(R.id.btnMoreOptions);
         }
     }
 }

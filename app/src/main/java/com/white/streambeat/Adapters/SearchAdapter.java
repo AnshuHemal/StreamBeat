@@ -7,10 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +24,7 @@ import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
+import com.white.streambeat.TrackMoreOptionsSheetFragment;
 
 import java.util.Collections;
 import java.util.List;
@@ -122,7 +125,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
         }
 
-        holder.itemView.setOnClickListener(v -> {
+        holder.itemLL.setOnClickListener(v -> {
             Object item = searchResults.get(position);
             if (position != currentlyPlayingPosition) {
                 if (item instanceof Tracks) {
@@ -134,6 +137,17 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             }
         });
+        holder.btnMoreOptions.setOnClickListener(v -> {
+            TrackMoreOptionsSheetFragment optionsFragment = TrackMoreOptionsSheetFragment.newInstance(track);
+            if (context instanceof AppCompatActivity) {
+                AppCompatActivity activity = (AppCompatActivity) context;
+                FragmentManager fragmentManager = activity.getSupportFragmentManager();
+                optionsFragment.show(fragmentManager, optionsFragment.getTag());
+            } else {
+                throw new IllegalStateException("Context must be an instance of AppCompatActivity");
+            }
+        });
+
     }
 
     private void configureAlbumViewHolder(AlbumViewHolder holder, Albums album) {
@@ -157,12 +171,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         Glide.with(context).load(artist.getImage_url()).into(holder.artistImage);
 
         // Set click listener
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Artist", Toast.LENGTH_SHORT).show();
-            }
-        });
+        holder.itemView.setOnClickListener(v -> Toast.makeText(context, "Artist", Toast.LENGTH_SHORT).show());
     }
 
     @Override
@@ -185,7 +194,8 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class TrackViewHolder extends RecyclerView.ViewHolder {
         TextView trackName, trackArtists;
-        ImageView trackImage, trackBtnLike;
+        ImageView trackImage, trackBtnLike, btnMoreOptions;
+        LinearLayout itemLL;
 
         public TrackViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -193,6 +203,8 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             trackArtists = itemView.findViewById(R.id.trackSearchArtistsName);
             trackImage = itemView.findViewById(R.id.trackSearchImage);
             trackBtnLike = itemView.findViewById(R.id.btnLike);
+            itemLL = itemView.findViewById(R.id.llSearchItem);
+            btnMoreOptions = itemView.findViewById(R.id.btnMoreOptions);
         }
     }
 

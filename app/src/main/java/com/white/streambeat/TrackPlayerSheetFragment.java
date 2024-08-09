@@ -20,8 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.palette.graphics.Palette;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -273,7 +271,7 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
                                 Palette.from(bitmap).generate(palette -> {
                                     if (palette != null) {
                                         int[] colors = new int[]{
-                                                palette.getDarkVibrantColor(ContextCompat.getColor(requireContext(), R.color.white)),
+                                                palette.getDarkVibrantColor(ContextCompat.getColor(requireContext(), R.color.darkTheme)),
                                                 palette.getDarkMutedColor(ContextCompat.getColor(requireContext(), R.color.darkTheme))
                                         };
                                         GradientDrawable gradientDrawable = new GradientDrawable(
@@ -302,15 +300,4 @@ public class TrackPlayerSheetFragment extends BottomSheetDialogFragment {
             }
         }
     }
-    public void dismissAllBottomSheets() {
-        FragmentManager fragmentManager = getParentFragmentManager(); // Ensure using the correct FragmentManager
-        if (fragmentManager != null) {
-            for (Fragment fragment : fragmentManager.getFragments()) {
-                if (fragment instanceof BottomSheetDialogFragment) {
-                    ((BottomSheetDialogFragment) fragment).dismiss();
-                }
-            }
-        }
-    }
-
 }

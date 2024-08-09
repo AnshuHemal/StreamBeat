@@ -1,8 +1,11 @@
 package com.white.streambeat.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
-public class Tracks {
+public class Tracks implements Parcelable {
     int track_id;
     String track_name;
     String file_url;
@@ -75,5 +78,37 @@ public class Tracks {
 
     public void setAlbum_title(String album_title) {
         this.album_title = album_title;
+    }
+
+    protected Tracks(Parcel in) {
+        track_name = in.readString();
+        artist_names = in.createStringArrayList();
+        track_image_url = in.readString();
+        likedByUser = in.readByte() != 0;
+    }
+
+    public static final Creator<Tracks> CREATOR = new Creator<Tracks>() {
+        @Override
+        public Tracks createFromParcel(Parcel in) {
+            return new Tracks(in);
+        }
+
+        @Override
+        public Tracks[] newArray(int size) {
+            return new Tracks[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(track_name);
+        dest.writeStringList(artist_names);
+        dest.writeString(track_image_url);
+        dest.writeByte((byte) (likedByUser ? 1 : 0));
     }
 }

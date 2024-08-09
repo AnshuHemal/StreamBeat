@@ -42,12 +42,7 @@ public class FavArtistsAdapter extends RecyclerView.Adapter<FavArtistsAdapter.Vi
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
         holder.homeArtistName.setText(artistsList.get(position).getArtist_name());
         Glide.with(context).load(artistsList.get(position).getImage_url()).into(holder.homeArtistImage);
-        holder.homeArtistLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(animation);
-            }
-        });
+        holder.homeArtistLL.setOnClickListener(v -> v.startAnimation(animation));
     }
 
     @Override

@@ -105,7 +105,7 @@ public class HomeFragment extends Fragment {
         fetchAllTracks();
         fetchUserInfo();
         fetchFavoriteArtists();
-        fetchPopularAlbums();
+//        fetchPopularAlbums();
 
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         artists = new ArrayList<>();
@@ -134,7 +134,6 @@ public class HomeFragment extends Fragment {
             fetchFavoriteArtists();
             fetchUserInfo();
         }
-
         return view;
     }
 

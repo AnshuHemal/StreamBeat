@@ -21,11 +21,8 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.squareup.picasso.Picasso;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.Models.Albums;
@@ -132,7 +129,6 @@ public class AlbumTracksFragment extends Fragment {
                     try {
                         JSONArray jsonArray = new JSONArray(response);
                         likedTracksIds = new ArrayList<>();
-                        likedTracksIds.clear();
 
                         for (int i = 0; i < jsonArray.length(); i++) {
                             int trackId = jsonArray.getJSONObject(i).getInt("track_id");

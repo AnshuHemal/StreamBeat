@@ -21,7 +21,6 @@ public class LocalFilesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_local_files, container, false);
         initialize(view);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
@@ -36,6 +35,7 @@ public class LocalFilesFragment extends Fragment {
                 transaction.commit();
             },100);
         });
+
         return view;
     }
 

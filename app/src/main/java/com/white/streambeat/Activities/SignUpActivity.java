@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.util.Patterns;
 import android.widget.DatePicker;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -46,7 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         binding = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         dialog = new LoadingDialog(this);
 
@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             DatePickerDialog dialog = new DatePickerDialog(SignUpActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth,
                     dateSetListener, year, month, day);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.show();
         });
 
@@ -114,73 +114,84 @@ public class SignUpActivity extends AppCompatActivity {
     public boolean checkUtilsAreFillOrNot() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date dateOfBirth = null;
+        String birthDateText = binding.etBirthDate.getText().toString().trim();
 
         try {
-            dateOfBirth = sdf.parse(binding.etBirthDate.getText().toString().trim());
+            if (!TextUtils.isEmpty(birthDateText)) {
+                dateOfBirth = sdf.parse(birthDateText);
+            }
         } catch (ParseException e) {
             showSnackbar(e.getMessage());
             binding.etBirthDate.setError("Error parsing date.");
         }
 
-        Calendar dob = Calendar.getInstance();
-        dob.setTime(dateOfBirth);
         Calendar today = Calendar.getInstance();
 
-        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
-            age--;
-        }
+        if (dateOfBirth != null) {
+            Calendar dob = Calendar.getInstance();
+            dob.setTime(dateOfBirth);
 
-        if (TextUtils.isEmpty(binding.etFirstName.getText()) || binding.etFirstName.getText().toString().contains(" ")) {
-            binding.etFirstName.setError("Field cannot be Empty..");
-            binding.etFirstName.requestFocus();
-            return false;
-        } else if (TextUtils.isEmpty(binding.etLastName.getText()) || binding.etLastName.getText().toString().contains(" ")) {
-            binding.etLastName.setError("Field cannot be Empty..");
-            binding.etLastName.requestFocus();
-            return false;
-        } else if (TextUtils.isEmpty(binding.etBirthDate.getText()) || binding.etBirthDate.getText().toString().contains(" ")) {
-            binding.etLastName.setError("Select your Birth Date..");
-            binding.etLastName.requestFocus();
-            return false;
-        } else if (age < 14) {
-            showSnackbar("Sorry, you don't meet StreamBeat's age requirements.");
-            return false;
-        } else if (TextUtils.isEmpty(binding.etEmailAddress.getText()) || binding.etEmailAddress.getText().toString().contains(" ")) {
-            binding.etEmailAddress.setError("Field cannot be Empty..");
-            binding.etEmailAddress.requestFocus();
-            return false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(binding.etEmailAddress.getText().toString()).matches()) {
-            binding.etEmailAddress.setError("Enter valid Email Address..");
-            binding.etEmailAddress.requestFocus();
-            return false;
-        } else if (TextUtils.isEmpty(binding.etPassword.getText()) || binding.etPassword.getText().toString().contains(" ")) {
-            binding.etPassword.setError("Field cannot be Empty..");
-            binding.etPassword.requestFocus();
-            return false;
-        } else if (binding.etPassword.getText().length() >= 8) {
-            boolean isDigit = false;
-            boolean isSymbol = false;
-            boolean isUpperCase = false;
-            char[] ch = binding.etPassword.getText().toString().toCharArray();
-            for (int i = 0; i < ch.length; i++) {
-                char c = binding.etPassword.getText().charAt(i);
-                if (Character.isDigit(c)) {
-                    isDigit = true;
-                } else if (Character.isUpperCase(c)) {
-                    isUpperCase = true;
-                } else if (!Character.isLetter(c)) {
-                    isSymbol = true;
-                }
+            int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+                age--;
             }
-            if (isDigit && isSymbol && isUpperCase) {
-                return true;
+
+            if (TextUtils.isEmpty(binding.etFirstName.getText()) || binding.etFirstName.getText().toString().contains(" ")) {
+                binding.etFirstName.setError("Field cannot be Empty.");
+                binding.etFirstName.requestFocus();
+                return false;
+            } else if (TextUtils.isEmpty(binding.etLastName.getText()) || binding.etLastName.getText().toString().contains(" ")) {
+                binding.etLastName.setError("Field cannot be Empty.");
+                binding.etLastName.requestFocus();
+                return false;
+            } else if (TextUtils.isEmpty(binding.etBirthDate.getText()) || binding.etBirthDate.getText().toString().contains(" ")) {
+                binding.etBirthDate.setError("Select your Birth Date.");
+                binding.etBirthDate.requestFocus();
+                return false;
+            } else if (age < 14) {
+                showSnackbar("Sorry, you don't meet StreamBeat's age requirements.");
+                return false;
+            } else if (TextUtils.isEmpty(binding.etEmailAddress.getText()) || binding.etEmailAddress.getText().toString().contains(" ")) {
+                binding.etEmailAddress.setError("Field cannot be Empty.");
+                binding.etEmailAddress.requestFocus();
+                return false;
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(binding.etEmailAddress.getText().toString()).matches()) {
+                binding.etEmailAddress.setError("Enter a valid Email Address.");
+                binding.etEmailAddress.requestFocus();
+                return false;
+            } else if (TextUtils.isEmpty(binding.etPassword.getText()) || binding.etPassword.getText().toString().contains(" ")) {
+                binding.etPassword.setError("Field cannot be Empty.");
+                binding.etPassword.requestFocus();
+                return false;
+            } else if (binding.etPassword.getText().length() >= 8) {
+                boolean isDigit = false;
+                boolean isSymbol = false;
+                boolean isUpperCase = false;
+                char[] ch = binding.etPassword.getText().toString().toCharArray();
+                for (char c : ch) {
+                    if (Character.isDigit(c)) {
+                        isDigit = true;
+                    } else if (Character.isUpperCase(c)) {
+                        isUpperCase = true;
+                    } else if (!Character.isLetter(c)) {
+                        isSymbol = true;
+                    }
+                }
+                if (isDigit && isSymbol && isUpperCase) {
+                    return true;
+                } else {
+                    showSnackbar("Password must contain at least one uppercase letter, one symbol, and one digit.");
+                    return false;
+                }
             } else {
-                showSnackbar("Password must contains at-least a uppercase, 1 symbol and a digit..");
+                showSnackbar("Password length should be 8 or more characters.");
                 return false;
             }
         } else {
-            showSnackbar("Password length should be 8 or more..");
+            if (TextUtils.isEmpty(binding.etBirthDate.getText())) {
+                binding.etBirthDate.setError("Select your Birth Date.");
+                binding.etBirthDate.requestFocus();
+            }
             return false;
         }
     }

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,6 +26,7 @@ import com.white.streambeat.databinding.ActivityLoginSignupBinding;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class LoginSignupActivity extends AppCompatActivity {
@@ -37,7 +37,6 @@ public class LoginSignupActivity extends AppCompatActivity {
     String mVerificationId;
     PhoneAuthProvider.ForceResendingToken mResendToken;
     String phone;
-
     LoadingDialog dialog;
 
     @Override
@@ -46,7 +45,7 @@ public class LoginSignupActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         binding = ActivityLoginSignupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         dialog = new LoadingDialog(this);
 
@@ -64,6 +63,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                 PhoneAuthCredential credential = null;
                 if (!TextUtils.isEmpty(binding.etCode.getText()) || !otp.contains(" ")) {
                     credential = PhoneAuthProvider.getCredential(mVerificationId, otp);
+                    showDialog();
                     signInWithPhoneAuthCredential(credential);
                 } else {
                     binding.etCode.setError("Enter Verification code..");
@@ -103,7 +103,6 @@ public class LoginSignupActivity extends AppCompatActivity {
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
-                    showDialog();
                     if (task.isSuccessful()) {
                         firebaseUser = task.getResult().getUser();
 

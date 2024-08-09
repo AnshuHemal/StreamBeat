@@ -3,19 +3,16 @@ package com.white.streambeat.Activities;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -30,7 +27,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -144,8 +140,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         dialog = new LoadingDialog(this);
-
-        requestNotificationPermission();
 
         setupMediaSession();
 
@@ -476,33 +470,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "StreamBeat";
-            String description = "Channel for music playback";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-    }
-
-    private void requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
-            } else {
-                createNotificationChannel();
-            }
-        } else {
-            createNotificationChannel();
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private void showNotification() {
         if (currentTrack == null) return;
@@ -536,25 +503,15 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                                         .setMediaSession(mediaSession.getSessionToken())
                                         .setShowActionsInCompactView(0, 1, 2))
                                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                                .setOngoing(isPlaying)
-                                .setProgress(100, 50, false);
+                                .setOngoing(true)
+                                .setSilent(true)
+                                .setNotificationSilent()
+                                .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.silent));
 
                         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                         notificationManager.notify(1, builder.build());
                     }
                 });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                createNotificationChannel();
-            } else {
-                Toast.makeText(this, "Notification permission is required for notifications", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     @Override

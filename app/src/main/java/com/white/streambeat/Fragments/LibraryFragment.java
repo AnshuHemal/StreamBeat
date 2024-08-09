@@ -1,6 +1,7 @@
 package com.white.streambeat.Fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,12 +18,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.white.streambeat.Activities.SetupArtistsActivity;
 import com.white.streambeat.Adapters.ArtistAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.R;
 
 public class LibraryFragment extends Fragment {
-    LinearLayout llLikedSongs;
+    LinearLayout llLikedSongs, llAddMoreArtists;
     TextView likeSongsCountTxt;
 
     @SuppressLint({"MissingInflatedId", "SetTextI18n"})
@@ -33,6 +35,7 @@ public class LibraryFragment extends Fragment {
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
         llLikedSongs = view.findViewById(R.id.llLikedSongs);
+        llAddMoreArtists = view.findViewById(R.id.addMoreArtistsLL);
         likeSongsCountTxt = view.findViewById(R.id.likeSongsCountTxt);
         RecyclerView artistsRecyclerView = view.findViewById(R.id.selectedArtistsRV);
         artistsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -51,6 +54,14 @@ public class LibraryFragment extends Fragment {
                 transaction.replace(R.id.frameLayout, likedSongsFragment);
                 transaction.commit();
             },100);
+        });
+
+        llAddMoreArtists.setOnClickListener(v -> {
+            v.startAnimation(animation);
+            new Handler().postDelayed(() -> {
+                startActivity(new Intent(getActivity(), SetupArtistsActivity.class));
+                requireActivity().finish();
+            }, 100);
         });
 
         return view;

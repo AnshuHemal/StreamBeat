@@ -74,7 +74,6 @@ public class ExploreFragment extends Fragment {
         searchAdapter = new SearchAdapter(getContext(), fragmentManager, searchResults);
         recyclerViewSearchResults.setAdapter(searchAdapter);
 
-
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -154,7 +153,6 @@ public class ExploreFragment extends Fragment {
                             }
                         }
 //                        displayLikedTracks();
-
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }

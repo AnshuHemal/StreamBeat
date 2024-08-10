@@ -96,6 +96,7 @@ public class HomeFragment extends Fragment {
 
         sharedPreferences = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
+
         if (savedInstanceState != null) {
             recyclerViewState = savedInstanceState.getParcelable(KEY_SCROLL_STATE);
         }
@@ -296,7 +297,7 @@ public class HomeFragment extends Fragment {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ALBUMS_DETAILS,
                 response -> {
-                    Log.d(TAG, "fetchAllAlbums response: " + response); // Log response
+                    Log.d(TAG, "fetchAllAlbums response: " + response);
                     if (response == null || response.isEmpty()) {
                         Toast.makeText(requireContext(), "Empty response from server", Toast.LENGTH_SHORT).show();
                         return;
@@ -337,17 +338,17 @@ public class HomeFragment extends Fragment {
                 Request.Method.POST,
                 ServerConnector.GET_ALL_TRACKS_DETAILS,
                 response -> {
-                    Log.d(TAG, "fetchAllTracks response: " + response); // Log response
+                    Log.d(TAG, "fetchAllTracks response: " + response);
                     if (response == null || response.trim().isEmpty()) {
                         Toast.makeText(requireContext(), "Empty response from server", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-                        JSONArray jsonArray = jsonObject.getJSONArray("response_all_tracks");
+                        JSONArray jsonArray1 = jsonObject.getJSONArray("response_all_tracks");
                         allTracks.clear();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject trackObj = jsonArray.getJSONObject(i);
+                        for (int i = 0; i < jsonArray1.length(); i++) {
+                            JSONObject trackObj = jsonArray1.getJSONObject(i);
                             int track_id = trackObj.getInt("track_id");
                             String track_name = trackObj.getString("track_name");
                             String file_url = trackObj.getString("file_url");
@@ -368,6 +369,7 @@ public class HomeFragment extends Fragment {
                                 }
                             }
                         }
+
                         saveTracksDetailsToSharedPreferences();
                         sharedViewModel.setAllTracksList(allTracks);
                     } catch (JSONException e) {
@@ -379,13 +381,12 @@ public class HomeFragment extends Fragment {
                     }
                 },
                 error -> {
-                    Log.e(TAG, "Volley Error: ", error); // Log error details
+                    Log.e(TAG, "Volley Error: ", error);
                     Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     onFetchComplete();
                 }
         ) {
         };
-
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
 

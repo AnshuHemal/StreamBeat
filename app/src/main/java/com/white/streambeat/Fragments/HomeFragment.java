@@ -556,7 +556,7 @@ public class HomeFragment extends Fragment {
         if (ServerConnector.likedTracksList == null) {
             ServerConnector.likedTracksList = new ArrayList<>();
         } else {
-            ServerConnector.likedTracksList.clear(); // Clear the list if already initialized
+            ServerConnector.likedTracksList.clear();
         }
         if (allTracks != null) {
             for (Tracks track : allTracks) {

@@ -131,19 +131,19 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
+    @SuppressLint("MissingPermission")
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-        @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action != null && action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device != null) {
-                    bluetoothDevice = device.getName();
-                    if (bluetoothDevice != null) {
-                        Toast.makeText(context, "Bluetooth connected with " + bluetoothDevice, Toast.LENGTH_SHORT).show();
-                    }
+                    String deviceName = device.getName() != null ? device.getName() : "Unnamed Device";
+                    Toast.makeText(context, "Bluetooth connected with " + deviceName, Toast.LENGTH_SHORT).show();
                 }
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                Toast.makeText(context, "Bluetooth device disconnected", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -195,7 +195,10 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             return true;
         });
 
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         registerReceiver(bluetoothReceiver, filter);
 
         miniPlayerView.setOnClickListener(v -> {
@@ -237,6 +240,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (currentTrackPosition >= 0 && currentTrackPosition < tracksList.size()) {
             currentTrack = tracksList.get(currentTrackPosition);
             showMiniPlayer(currentTrack);
+            updateIconLikedTracks(currentTrack);
             saveUserLog(currentTrack);
             showNotification();
 
@@ -269,6 +273,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                             ((TrackPlayerSheetFragment) fragment).updateProgress(currentPosition, mediaPlayer.getDuration());
                         }
                         showNotification();
+                        updateIconLikedTracks(currentTrack);
                         handler.postDelayed(this, 1000);
                     }
                 }
@@ -308,7 +313,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
     public void showMiniPlayer(Tracks tracks) {
         miniPlayerTitle.setText(tracks.getTrack_name());
-        updateIconLikedTracks(tracks);
 
         Picasso.get().load(tracks.getTrack_image_url())
                 .into(miniPlayerImage, new Callback() {
@@ -341,21 +345,17 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         }
         miniPlayerArtistsNames.setText(artistsBuilder.toString());
         miniPlayerView.setVisibility(View.VISIBLE);
-        updateIconLikedTracks(tracks);
 
         miniPlayerPlayPause.setOnClickListener(v -> togglePlayback());
         miniPlayerShuffle.setOnClickListener(v -> {
             if (!tracks.isLikedByUser()) {
                 addToLikedSongs(tracks, firebaseUser.getPhoneNumber());
                 tracks.setLikedByUser(true);
-                miniPlayerShuffle.setImageResource(R.drawable.added);
-                miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.lightGreen));
             } else {
                 removeFromLikedSongs(tracks, firebaseUser.getPhoneNumber());
                 tracks.setLikedByUser(false);
-                miniPlayerShuffle.setImageResource(R.drawable.add_to_liked_songs);
-                miniPlayerShuffle.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.white));
             }
+            updateIconLikedTracks(tracks);
         });
     }
 
@@ -371,8 +371,10 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
     public void togglePlayback() {
         if (mediaPlayer.isPlaying()) {
+            updateIconLikedTracks(currentTrack);
             pauseTrack();
         } else {
+            updateIconLikedTracks(currentTrack);
             playTrack();
         }
     }
@@ -384,6 +386,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             miniPlayerPlayPause.setImageResource(R.drawable.play_track);
             handler.removeCallbacks(updateProgressRunnable);
             showNotification();
+            updateIconLikedTracks(currentTrack);
         }
     }
 
@@ -397,6 +400,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             trackProgressIndicator.setMax(mediaPlayer.getDuration());
             handler.post(updateProgressRunnable);
             showNotification();
+            updateIconLikedTracks(currentTrack);
         }
     }
 
@@ -416,6 +420,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
             playCurrentTrack();
             showMiniPlayer(nextTrack);
+            updateIconLikedTracks(nextTrack);
             showNotification();
             updateAlbumTracksAdapter();
             updateSearchAdapter();
@@ -436,6 +441,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             updateSearchAdapter();
             playCurrentTrack();
             showMiniPlayer(tracksList.get(currentTrackPosition));
+            updateIconLikedTracks(tracksList.get(currentTrackPosition));
             showNotification();
         }
     }
@@ -558,20 +564,20 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (handler != null) {
-            handler.removeCallbacks(updateProgressRunnable);
-        }
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        if (mediaSession != null) {
-            mediaSession.release();
-            mediaSession = null;
-        }
-        unregisterReceiver(bluetoothReceiver);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.cancel(1);
+//        if (handler != null) {
+//            handler.removeCallbacks(updateProgressRunnable);
+//        }
+//        if (mediaPlayer != null) {
+//            mediaPlayer.release();
+//            mediaPlayer = null;
+//        }
+//        if (mediaSession != null) {
+//            mediaSession.release();
+//            mediaSession = null;
+//        }
+//        unregisterReceiver(bluetoothReceiver);
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        notificationManager.cancel(1);
     }
 
     private final BroadcastReceiver localReceiver = new BroadcastReceiver() {
@@ -658,4 +664,5 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     public void onTrackUpdated(Tracks updatedTrack) {
         showMiniPlayer(updatedTrack);
     }
+
 }

@@ -29,19 +29,57 @@ import java.util.List;
 public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder> {
 
     Context context;
-    List<Tracks> tracksList;
+    private List<Tracks> tracksList;
     private int currentlyPlayingPosition = -1;
-    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    FirebaseUser firebaseUser;
 
     public TracksAdapter(Context context) {
         this.context = context;
         this.tracksList = new ArrayList<>();
+        this.firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setTracksList(List<Tracks> tracksList) {
         this.tracksList = tracksList;
         notifyDataSetChanged();
+    }
+
+    public void updateTrack(Tracks updatedTrack) {
+        for (int i = 0; i < tracksList.size(); i++) {
+            Tracks track = tracksList.get(i);
+            if (track.getTrack_id() == updatedTrack.getTrack_id()) {
+                tracksList.set(i, updatedTrack);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void removeTrack(Tracks trackToRemove) {
+        int position = -1;
+        for (int i = 0; i < tracksList.size(); i++) {
+            if (tracksList.get(i).getTrack_id() == trackToRemove.getTrack_id()) {
+                position = i;
+                break;
+            }
+        }
+        if (position != -1) {
+            tracksList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, tracksList.size());
+        }
+    }
+
+    public void addTrack(Tracks trackToAdd) {
+        for (int i = 0; i < tracksList.size(); i++) {
+            if (tracksList.get(i).getTrack_id() == trackToAdd.getTrack_id()) {
+                return;
+            }
+        }
+        tracksList.add(trackToAdd);
+        notifyItemInserted(tracksList.size() - 1);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -60,19 +98,20 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull TracksAdapter.ViewHolder holder, int position) {
-        holder.trackName.setText(tracksList.get(position).getTrack_name());
+        Tracks track = tracksList.get(position);
+        holder.trackName.setText(track.getTrack_name());
 
         StringBuilder artistsBuilder = new StringBuilder();
-        for (int i = 0; i < tracksList.get(position).getArtist_names().size(); i++) {
-            artistsBuilder.append(tracksList.get(position).getArtist_names().get(i));
-            if (i < tracksList.get(position).getArtist_names().size() - 1) {
+        for (int i = 0; i < track.getArtist_names().size(); i++) {
+            artistsBuilder.append(track.getArtist_names().get(i));
+            if (i < track.getArtist_names().size() - 1) {
                 artistsBuilder.append(", ");
             }
         }
         holder.trackArtists.setText(artistsBuilder.toString());
-        Picasso.get().load(tracksList.get(position).getTrack_image_url()).into(holder.trackImage);
+        Picasso.get().load(track.getTrack_image_url()).into(holder.trackImage);
 
-        if (tracksList.get(position).isLikedByUser()) {
+        if (track.isLikedByUser()) {
             holder.trackLikeBtn.setImageResource(R.drawable.added);
             holder.trackLikeBtn.setColorFilter(ContextCompat.getColor(context, R.color.lightGreen));
         } else {
@@ -94,17 +133,20 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
         });
 
         holder.trackLikeBtn.setOnClickListener(v -> {
-            if (!tracksList.get(position).isLikedByUser()) {
-                ((DashboardActivity) context).addToLikedSongs(tracksList.get(position), firebaseUser.getPhoneNumber());
-                notifyDataSetChanged();
+            if (!track.isLikedByUser()) {
+                ((DashboardActivity) context).addToLikedSongs(track, firebaseUser.getPhoneNumber());
+                track.setLikedByUser(true); // Update locally
+                updateTrack(track); // Notify adapter
+                addTrack(track);
             } else {
-                ((DashboardActivity) context).removeFromLikedSongs(tracksList.get(position), firebaseUser.getPhoneNumber());
-                notifyDataSetChanged();
+                ((DashboardActivity) context).removeFromLikedSongs(track, firebaseUser.getPhoneNumber());
+                track.setLikedByUser(false); // Update locally
+                removeTrack(track);
             }
         });
 
         holder.btnMoreOptions.setOnClickListener(v -> {
-            TrackMoreOptionsSheetFragment optionsFragment = TrackMoreOptionsSheetFragment.newInstance(tracksList.get(position));
+            TrackMoreOptionsSheetFragment optionsFragment = TrackMoreOptionsSheetFragment.newInstance(track);
             if (context instanceof AppCompatActivity) {
                 AppCompatActivity activity = (AppCompatActivity) context;
                 FragmentManager fragmentManager = activity.getSupportFragmentManager();

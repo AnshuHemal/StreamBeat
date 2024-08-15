@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "1034234259542",
-    "project_id": "streambeat-e2d15",
-    "storage_bucket": "streambeat-e2d15.appspot.com"
+    "project_number": "828080015086",
+    "project_id": "music-streaming-app-ebb79",
+    "storage_bucket": "music-streaming-app-ebb79.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1034234259542:android:a7d9088ab2a337231473f7",
+        "mobilesdk_app_id": "1:828080015086:android:a9b9f4a7571757fba615ff",
+        "android_client_info": {
+          "package_name": "com.white.musicstreamingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvcFMFUbBPpegIShsYcDCZ6Kyqf520p0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828080015086:android:2ec076219a3acbf9a615ff",
         "android_client_info": {
           "package_name": "com.white.streambeat"
         }
@@ -15,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyASVdTHxHzQo3za5sV8cL_tjfbqncD1h4U"
+          "current_key": "AIzaSyAvcFMFUbBPpegIShsYcDCZ6Kyqf520p0o"
         }
       ],
       "services": {

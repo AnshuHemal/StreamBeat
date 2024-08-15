@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/lightTheme"
     tools:context=".Fragments.HomeFragment">
 
-    <!-- Fixed Good Morning Section -->
     <LinearLayout
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
         android:id="@+id/signUpLL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="16dp">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -40,22 +38,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:text="Hemal Katariya"
+                android:text="White Turtle"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
         </LinearLayout>
 
-        <!-- Uncomment this if you need the notification bell image -->
-        <!-- <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/notification_bell"
-            app:tint="@color/white" /> -->
+        <!--        <ImageView-->
+        <!--            android:layout_width="30dp"-->
+        <!--            android:layout_height="30dp"-->
+        <!--            android:src="@drawable/notification_bell"-->
+        <!--            app:tint="@color/white" />-->
 
     </LinearLayout>
 
-    <!-- NestedScrollView for scrolling content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -68,120 +64,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="0dp">
-
-        <!-- Main LinearLayout with other content -->
-        <LinearLayout
-            android:padding="16dp"
-            android:id="@+id/mainLL"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_marginStart="5dp"
-                    android:id="@+id/homeLikedSongsLL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/edit_text_bg"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/liked_img" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:fontFamily="@font/mulish_medium"
-                        android:text="Liked Songs"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/homeLocalFilesLL"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/edit_text_bg"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/local_img" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:fontFamily="@font/mulish_medium"
-                        android:text="Local Files"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/homeLogAlbumRV"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:paddingTop="16dp">
 
             <TextView
+                android:paddingStart="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
-                android:text="New Releases"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewReleases"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
-                android:text="Recommended for today"
+                android:text="Recommended for Today"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
@@ -193,10 +83,10 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:paddingStart="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
                 android:text="Your Favorite Artists"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -209,10 +99,10 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:paddingStart="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
                 android:text="Popular Albums"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -225,10 +115,10 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:paddingStart="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
                 android:text="Bests of Artists"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -241,11 +131,11 @@
                 android:layout_marginBottom="16dp" />
 
             <TextView
+                android:paddingStart="16dp"
                 android:id="@+id/moreLikeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
                 android:text="More like {Artist Name}"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -256,8 +146,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp" />
-
-        </LinearLayout>
 
         </LinearLayout>
 

@@ -1,6 +1,5 @@
 package com.white.streambeat.Adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,59 +17,59 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
 import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.R;
 
 import java.util.List;
 
-public class PopularAlbumsAdapter extends RecyclerView.Adapter<PopularAlbumsAdapter.ViewHolder> {
+public class HomeLogAlbumsAdapter extends RecyclerView.Adapter<HomeLogAlbumsAdapter.ViewHolder> {
 
     Context context;
-    List<Albums> albumsList;
+    List<Albums> albums;
     FragmentManager fragmentManager;
 
-    public PopularAlbumsAdapter(Context context, List<Albums> albumsList, FragmentManager fragmentManager) {
+    public HomeLogAlbumsAdapter(Context context, List<Albums> albums, FragmentManager fragmentManager) {
         this.context = context;
-        this.albumsList = albumsList;
+        this.albums = albums;
         this.fragmentManager = fragmentManager;
     }
 
     @NonNull
     @Override
-    public PopularAlbumsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.home_albums, parent, false);
+    public HomeLogAlbumsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.home_log_albums_layout, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PopularAlbumsAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull HomeLogAlbumsAdapter.ViewHolder holder, int position) {
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
-        holder.homeAlbumTextName.setText(albumsList.get(position).getAlbum_title());
-        Glide.with(context).load(albumsList.get(position).getCover_image_url()).into(holder.homeAlbumImage);
+        Albums album = albums.get(position);
+        holder.homeLogAlbumsTV.setText(album.getAlbum_title());
+        Glide.with(context).load(album.getCover_image_url()).into(holder.homeLogAlbumsIV);
 
-        holder.homeAlbumLL.setOnClickListener(v -> {
+        holder.homeLogAlbumsLL.setOnClickListener(v -> {
             v.startAnimation(animation);
-            new Handler().postDelayed(() -> navigateToAlbumTracksFragment(fragmentManager, albumsList.get(position).getAlbum_title(), albumsList.get(position).getCover_image_url()), 100);
+            new Handler().postDelayed(() -> navigateToAlbumTracksFragment(fragmentManager, album.getAlbum_title(), album.getCover_image_url()), 100);
         });
     }
 
     @Override
     public int getItemCount() {
-        return albumsList.size();
+        return Math.min(albums.size(), 6);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout homeAlbumLL;
-        TextView homeAlbumTextName;
-        ImageView homeAlbumImage;
+        LinearLayout homeLogAlbumsLL;
+        ImageView homeLogAlbumsIV;
+        TextView homeLogAlbumsTV;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            homeAlbumTextName = itemView.findViewById(R.id.homeBestOfArtistsAlbumName);
-            homeAlbumImage = itemView.findViewById(R.id.homeBestOfArtistsAlbumImage);
-            homeAlbumLL = itemView.findViewById(R.id.homeBestOfArtistsAlbumLL);
+            homeLogAlbumsLL = itemView.findViewById(R.id.homeLogAlbumLL);
+            homeLogAlbumsTV = itemView.findViewById(R.id.homeLogALbumTV);
+            homeLogAlbumsIV = itemView.findViewById(R.id.homeLogAlbumIV);
         }
     }
     public void navigateToAlbumTracksFragment(FragmentManager fragmentManager, String album_title, String album_image_url) {

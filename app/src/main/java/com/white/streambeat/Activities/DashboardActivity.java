@@ -54,6 +54,7 @@ import com.white.streambeat.Fragments.HomeFragment;
 import com.white.streambeat.Fragments.LibraryFragment;
 import com.white.streambeat.Fragments.ProfileFragment;
 import com.white.streambeat.LoadingDialog;
+import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.NotificationReceiver;
@@ -95,7 +96,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     private Runnable updateProgressRunnable;
     private List<Tracks> tracksList;
     private int currentTrackPosition = -1;
-    String bluetoothDevice = "";
 
     public void addToLikedSongs(Tracks track, String phoneNumber) {
         StringRequest stringRequest = new StringRequest(
@@ -157,6 +157,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         dialog = new LoadingDialog(this);
+
 
         setupMediaSession();
 
@@ -321,7 +322,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         Bitmap bitmap = ((BitmapDrawable) miniPlayerImage.getDrawable()).getBitmap();
                         Palette.from(bitmap).generate(palette -> {
                             if (palette != null) {
-                                int dominantColor = palette.getDarkMutedColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightGreen));
+                                int dominantColor = palette.getDarkMutedColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightTheme));
                                 ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), miniPlayerView.getSolidColor(), dominantColor);
                                 colorAnimation.setDuration(300); // milliseconds
                                 colorAnimation.addUpdateListener(animator -> miniPlayerView.setBackgroundColor((int) animator.getAnimatedValue()));
@@ -498,6 +499,16 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     }
 
     private void saveUserLog(Tracks track) {
+        String album_title = track.getAlbum_title();
+        int album_id = 0;
+        for (Albums album : Objects.requireNonNull(sharedViewModel.getAllAlbumsList().getValue())) {
+            if (album.getAlbum_title().equals(album_title)) {
+                album_id = album.getAlbum_id();
+                break;
+            }
+        }
+
+        int finalAlbum_id = album_id;
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.SAVE_USER_LOGS,
@@ -509,7 +520,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             protected Map<String, String> getParams() {
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("key_phone", firebaseUser.getPhoneNumber());
-                hashMap.put("track_ids", String.valueOf(track.getTrack_id()));
+                hashMap.put("album_ids", String.valueOf(finalAlbum_id));
                 hashMap.put("listen_date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
                 return hashMap;
             }
@@ -564,20 +575,20 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (handler != null) {
-//            handler.removeCallbacks(updateProgressRunnable);
-//        }
-//        if (mediaPlayer != null) {
-//            mediaPlayer.release();
-//            mediaPlayer = null;
-//        }
-//        if (mediaSession != null) {
-//            mediaSession.release();
-//            mediaSession = null;
-//        }
-//        unregisterReceiver(bluetoothReceiver);
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//        notificationManager.cancel(1);
+        if (handler != null) {
+            handler.removeCallbacks(updateProgressRunnable);
+        }
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession = null;
+        }
+        unregisterReceiver(bluetoothReceiver);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.cancel(1);
     }
 
     private final BroadcastReceiver localReceiver = new BroadcastReceiver() {

@@ -1,5 +1,6 @@
 package com.white.streambeat.Connections;
 
+import com.white.streambeat.Models.Albums;
 import com.white.streambeat.Models.Artists;
 import com.white.streambeat.Models.Tracks;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 public class ServerConnector {
     public static String serverUrl = "https://anantpolymers.com/StreamBeat/sb_users.php/";
+//    public static String serverUrl = "http://192.168.63.36/StreamBeat/sb_users.php";
     public static String LOGIN_URL = serverUrl + "login";
     public static String REGISTER_URL = serverUrl + "register";
     public static String CHECK_LOGIN_STATUS = serverUrl + "check_login_status";
@@ -34,4 +36,5 @@ public class ServerConnector {
     public static List<Artists> favoriteArtists = new ArrayList<>();
     public static int likedSongsCount = 0;
     public static List<Tracks> likedTracksList = new ArrayList<>();
+    public static List<Albums> logAlbumsList = new ArrayList<>();
 }

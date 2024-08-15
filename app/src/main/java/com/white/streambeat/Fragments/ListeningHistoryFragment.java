@@ -88,7 +88,7 @@ public class ListeningHistoryFragment extends Fragment {
                         for (int i = 0; i < logsArray.length(); i++) {
                             JSONObject logObject = logsArray.getJSONObject(i);
                             String listenDate = logObject.getString("listen_date");
-                            JSONArray albumIdsArray = logObject.getJSONArray("track_ids");
+                            JSONArray albumIdsArray = logObject.getJSONArray("album_ids");
 
                             for (int j = 0; j < albumIdsArray.length(); j++) {
                                 albumIdsList.add(albumIdsArray.getInt(j));

@@ -7,17 +7,21 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +32,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.FavArtistsAdapter;
+import com.white.streambeat.Adapters.HomeLogAlbumsAdapter;
 import com.white.streambeat.Adapters.PopularAlbumsAdapter;
 import com.white.streambeat.Connections.ServerConnector;
 import com.white.streambeat.LoadingDialog;
@@ -48,12 +53,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class HomeFragment extends Fragment {
 
     TextView greetingTxt, unameTxt;
     FirebaseUser firebaseUser;
-    RecyclerView recyclerViewFavArtists, recyclerViewPopularAlbums;
+    LinearLayout homeLikedSongsLL, homeLocalFilesLL;
+    RecyclerView recyclerViewFavArtists, recyclerViewPopularAlbums, recyclerViewReleases, recyclerViewRecommended,
+            homeLogAlbumRV;
 
     List<Artists> artists = new ArrayList<>();
     List<Albums> popularAlbums = new ArrayList<>();
@@ -64,13 +72,11 @@ public class HomeFragment extends Fragment {
 
     LoadingDialog dialog;
     private int fetchCount = 0;
-    final int TOTAL_FETCHES = 5;
+    final int TOTAL_FETCHES = 7;
 
     FavArtistsAdapter favArtistsAdapter;
     PopularAlbumsAdapter albumsAdapter;
-
-    private static final String KEY_SCROLL_STATE = "scroll_state";
-    private Parcelable recyclerViewState;
+    HomeLogAlbumsAdapter logAlbumsAdapter;
 
     private SharedViewModel sharedViewModel;
 
@@ -78,10 +84,12 @@ public class HomeFragment extends Fragment {
     private static final String PREF_DATA_FETCHED = "data_fetched";
     SharedPreferences sharedPreferences;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
         dialog = new LoadingDialog(requireContext());
         fetchCount = 0;
@@ -91,15 +99,15 @@ public class HomeFragment extends Fragment {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         greetingTxt = view.findViewById(R.id.txtGreeting);
         unameTxt = view.findViewById(R.id.txtUsername);
+        homeLikedSongsLL = view.findViewById(R.id.homeLikedSongsLL);
+        homeLocalFilesLL = view.findViewById(R.id.homeLocalFilesLL);
         recyclerViewFavArtists = view.findViewById(R.id.recyclerViewFavoriteArtists);
         recyclerViewPopularAlbums = view.findViewById(R.id.recyclerViewPopularAlbums);
+        recyclerViewReleases = view.findViewById(R.id.recyclerViewReleases);
+        recyclerViewRecommended = view.findViewById(R.id.recyclerViewRecommended);
+        homeLogAlbumRV = view.findViewById(R.id.homeLogAlbumRV);
 
         sharedPreferences = requireActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-
-
-        if (savedInstanceState != null) {
-            recyclerViewState = savedInstanceState.getParcelable(KEY_SCROLL_STATE);
-        }
 
         showGreetingMsg();
         fetchAllArtists();
@@ -111,21 +119,48 @@ public class HomeFragment extends Fragment {
         fetchUsersLikedTracks();
 //        fetchPopularAlbums();
 
+        List<Albums> albums = new ArrayList<>();
+        recyclerViewReleases.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        albums.add(new Albums(201, "Bad Newz", "https://i.scdn.co/image/ab67616d00001e023eacecab70822f60b71be0cd"));
+        albums.add(new Albums(202, "Ishq Vishk Rebound", "https://i.scdn.co/image/ab67616d0000b2738e683ee9f83a4b1dc502acf0"));
+        albums.add(new Albums(203, "Mr. & Mrs. Mahi", "https://i.scdn.co/image/ab67616d0000b273373b21b6dfdb6cd71e03101f"));
+        albumsAdapter = new PopularAlbumsAdapter(getContext(), albums, getParentFragmentManager());
+        recyclerViewReleases.setAdapter(albumsAdapter);
+
+        List<Albums> albumsRecommend = new ArrayList<>();
+        recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        albumsRecommend.add(new Albums(201, "Tera Fitoor (From Genius)", "https://i.scdn.co/image/ab67616d0000b273b10cd00a5865ea695f322dd7"));
+        albumsRecommend.add(new Albums(202, "Ve Kamleya ", "https://i.scdn.co/image/ab67616d0000b27339890c916878b32aebd1d0ee"));
+        albumsRecommend.add(new Albums(203, "Satranga (From 'ANIMAL')", "https://i.scdn.co/image/ab67616d0000b273021d7017f73387b008eab271"));
+        albumsAdapter = new PopularAlbumsAdapter(getContext(), albumsRecommend, getParentFragmentManager());
+        recyclerViewRecommended.setAdapter(albumsAdapter);
+
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         artists = new ArrayList<>();
         favArtistsAdapter = new FavArtistsAdapter(getContext(), artists);
         recyclerViewFavArtists.setAdapter(favArtistsAdapter);
-        if (recyclerViewState != null) {
-            Objects.requireNonNull(recyclerViewFavArtists.getLayoutManager()).onRestoreInstanceState(recyclerViewState);
-        }
 
         recyclerViewPopularAlbums.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         popularAlbums = new ArrayList<>();
         albumsAdapter = new PopularAlbumsAdapter(getContext(), popularAlbums, getParentFragmentManager());
         recyclerViewPopularAlbums.setAdapter(albumsAdapter);
-        if (recyclerViewState != null) {
-            Objects.requireNonNull(recyclerViewPopularAlbums.getLayoutManager()).onRestoreInstanceState(recyclerViewState);
-        }
+
+        homeLikedSongsLL.setOnClickListener(v -> {
+            v.startAnimation(animation);
+
+            new Handler().postDelayed(() -> {
+                Fragment likedSongsFragment = new LikedSongsFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.frameLayout, likedSongsFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            },100);
+        });
+
+        homeLocalFilesLL.setOnClickListener(v -> {
+            v.startAnimation(animation);
+            Toast.makeText(getContext(), "This Feature is coming soon..", Toast.LENGTH_SHORT).show();
+        });
 
         boolean dataFetched = sharedPreferences.getBoolean(PREF_DATA_FETCHED, false);
         if (dataFetched) {
@@ -139,14 +174,6 @@ public class HomeFragment extends Fragment {
             fetchUserInfo();
         }
         return view;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (recyclerViewPopularAlbums != null) {
-            outState.putParcelable(KEY_SCROLL_STATE, Objects.requireNonNull(recyclerViewPopularAlbums.getLayoutManager()).onSaveInstanceState());
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -203,7 +230,7 @@ public class HomeFragment extends Fragment {
         } else if (hourOfDay < 18) {
             greetingMessage = "Good Afternoon, \uD83D\uDC4B ";
         } else {
-            greetingMessage = "Good Evening, \uD83D\uDC4B ";
+            greetingMessage = "Good Morning, \uD83D\uDC4B ";
         }
         greetingTxt.setText(greetingMessage);
     }
@@ -317,6 +344,7 @@ public class HomeFragment extends Fragment {
                             }
                             saveAlbumsDetailsToSharedPreferences();
                             sharedViewModel.setAllAlbumsList(allAlbums);
+                            fetchUserLogs();
                         }
 
                     } catch (Exception e) {
@@ -514,6 +542,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void fetchUsersLikedTracks() {
+        dialog.show();
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
                 ServerConnector.FETCH_USERS_LIKED_TRACKS,
@@ -538,8 +567,13 @@ public class HomeFragment extends Fragment {
                     } catch (Exception e) {
                         Log.d(TAG, "fetchUsersLikedTracks: " + e.getMessage());
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
                     }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
+                }, error -> {
+                    onFetchComplete();
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         ) {
             @Override
             protected Map<String, String> getParams() {
@@ -657,10 +691,74 @@ public class HomeFragment extends Fragment {
         sharedPreferences.edit().putString("all_tracks_details", jsonArray.toString()).apply();
     }
 
+    private void fetchUserLogs() {
+        dialog.show();
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_USER_LOGS,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray logsArray = jsonObject.getJSONArray("response_logs");
+                        List<Integer> albumIdsList = new ArrayList<>();
+
+                        for (int i = 0; i < logsArray.length(); i++) {
+                            JSONObject logObject = logsArray.getJSONObject(i);
+                            String listenDate = logObject.getString("listen_date");
+                            JSONArray albumIdsArray = logObject.getJSONArray("album_ids");
+
+                            for (int j = 0; j < albumIdsArray.length(); j++) {
+                                albumIdsList.add(albumIdsArray.getInt(j));
+                            }
+                            sharedViewModel.setAlbumIdsList(albumIdsList);
+                            filterLogAlbums(albumIdsList);
+                        }
+
+                    } catch (Exception e) {
+                        Log.d(TAG, "fetchUserLogs: " + e.getMessage());
+//                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } finally {
+                        onFetchComplete();
+                    }
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("key_phone", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
+                return hashMap;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void filterLogAlbums(List<Integer> albumIdsFromHistory) {
+        ServerConnector.logAlbumsList.clear();
+        List<Albums> filteredAlbums = Objects.requireNonNull(sharedViewModel.getAllAlbumsList().getValue()).stream()
+                .filter(album -> albumIdsFromHistory.contains(album.getAlbum_id()))
+                .collect(Collectors.toList());
+        ServerConnector.logAlbumsList.addAll(filteredAlbums);
+
+        homeLogAlbumRV.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        logAlbumsAdapter = new HomeLogAlbumsAdapter(getContext(), ServerConnector.logAlbumsList, getParentFragmentManager());
+        homeLogAlbumRV.setAdapter(logAlbumsAdapter);
+    }
+
     private void onFetchComplete() {
         fetchCount++;
         if (fetchCount >= TOTAL_FETCHES) {
             dialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (firebaseUser != null) {
+            fetchUserLogs();
         }
     }
 }

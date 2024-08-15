@@ -36,7 +36,7 @@
             android:name=".Activities.DashboardActivity"
             android:screenOrientation="portrait"
             android:exported="false"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
         <activity
             android:name=".Activities.LoginSignupActivity"
             android:screenOrientation="portrait"

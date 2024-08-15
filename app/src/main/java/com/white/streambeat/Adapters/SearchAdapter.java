@@ -143,7 +143,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (position != currentlyPlayingPosition) {
                 if (item instanceof Tracks) {
                     Tracks clickedTrack = (Tracks) item;
-                    ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0);
+                    ((DashboardActivity) context).playTracks(Collections.singletonList(clickedTrack), 0, false);
                     setCurrentlyPlayingPosition(position);
                 } else {
                     Toast.makeText(context, "Invalid track item clicked", Toast.LENGTH_SHORT).show();

@@ -84,7 +84,6 @@ public class HomeLogAlbumsAdapter extends RecyclerView.Adapter<HomeLogAlbumsAdap
         if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             fragmentManager.beginTransaction()
                     .replace(R.id.frameLayout, albumTracksFragment)
-                    .addToBackStack(null)
                     .commit();
         }
     }

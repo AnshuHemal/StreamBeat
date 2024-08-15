@@ -127,7 +127,7 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
 
         holder.llSearchItem.setOnClickListener(v -> {
             if (position != currentlyPlayingPosition) {
-                ((DashboardActivity) context).playTracks(tracksList, position);
+                ((DashboardActivity) context).playTracks(tracksList, position, true);
                 setCurrentlyPlayingPosition(position);
             }
         });

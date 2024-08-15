@@ -36,5 +36,6 @@ public class ServerConnector {
     public static List<Artists> favoriteArtists = new ArrayList<>();
     public static int likedSongsCount = 0;
     public static List<Tracks> likedTracksList = new ArrayList<>();
+    public static List<Tracks> allTracksList = new ArrayList<>();
     public static List<Albums> logAlbumsList = new ArrayList<>();
 }

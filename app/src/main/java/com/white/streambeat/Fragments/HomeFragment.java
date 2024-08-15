@@ -372,6 +372,7 @@ public class HomeFragment extends Fragment {
                         return;
                     }
                     try {
+                        ServerConnector.allTracksList.clear();
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray1 = jsonObject.getJSONArray("response_all_tracks");
                         allTracks.clear();
@@ -399,6 +400,7 @@ public class HomeFragment extends Fragment {
                         }
 
                         saveTracksDetailsToSharedPreferences();
+                        ServerConnector.allTracksList.addAll(allTracks);
                         sharedViewModel.setAllTracksList(allTracks);
                     } catch (JSONException e) {
                         Toast.makeText(getContext(), "JSON Parsing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -704,7 +706,6 @@ public class HomeFragment extends Fragment {
 
                         for (int i = 0; i < logsArray.length(); i++) {
                             JSONObject logObject = logsArray.getJSONObject(i);
-                            String listenDate = logObject.getString("listen_date");
                             JSONArray albumIdsArray = logObject.getJSONArray("album_ids");
 
                             for (int j = 0; j < albumIdsArray.length(); j++) {
@@ -716,7 +717,6 @@ public class HomeFragment extends Fragment {
 
                     } catch (Exception e) {
                         Log.d(TAG, "fetchUserLogs: " + e.getMessage());
-//                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     } finally {
                         onFetchComplete();
                     }

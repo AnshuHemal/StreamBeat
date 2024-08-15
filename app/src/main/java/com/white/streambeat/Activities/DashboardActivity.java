@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -84,6 +83,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     ImageView miniPlayerPlayPause, miniPlayerShuffle, miniPlayerImage;
 
     LoadingDialog dialog;
+    boolean isPlayingFromAlbum = false;
 
     MediaSessionCompat mediaSession;
     private static final String CHANNEL_ID = "music_channel";
@@ -131,23 +131,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
     }
 
-    @SuppressLint("MissingPermission")
-    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (device != null) {
-                    String deviceName = device.getName() != null ? device.getName() : "Unnamed Device";
-                    Toast.makeText(context, "Bluetooth connected with " + deviceName, Toast.LENGTH_SHORT).show();
-                }
-            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                Toast.makeText(context, "Bluetooth device disconnected", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,8 +140,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         dialog = new LoadingDialog(this);
-
-
         setupMediaSession();
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
@@ -196,12 +177,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             return true;
         });
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-        registerReceiver(bluetoothReceiver, filter);
-
         miniPlayerView.setOnClickListener(v -> {
             if (currentTrack != null) {
                 TrackPlayerSheetFragment trackPlayerSheetFragment = new TrackPlayerSheetFragment(currentTrack);
@@ -231,9 +206,10 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         }
     }
 
-    public void playTracks(List<Tracks> tracksList, int position) {
-        this.tracksList = tracksList;
+    public void playTracks(List<Tracks> tracksList, int position, boolean isFromAlbum) {
         this.currentTrackPosition = position;
+        this.isPlayingFromAlbum = isFromAlbum;
+        this.tracksList = tracksList;
         playCurrentTrack();
     }
 
@@ -242,6 +218,9 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             currentTrack = tracksList.get(currentTrackPosition);
             showMiniPlayer(currentTrack);
             updateIconLikedTracks(currentTrack);
+            if (!isPlayingFromAlbum) {
+                tracksList = ServerConnector.allTracksList;
+            }
             saveUserLog(currentTrack);
             showNotification();
 
@@ -324,7 +303,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                             if (palette != null) {
                                 int dominantColor = palette.getDarkMutedColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightTheme));
                                 ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), miniPlayerView.getSolidColor(), dominantColor);
-                                colorAnimation.setDuration(300); // milliseconds
+                                colorAnimation.setDuration(300);
                                 colorAnimation.addUpdateListener(animator -> miniPlayerView.setBackgroundColor((int) animator.getAnimatedValue()));
                                 colorAnimation.start();
                             }
@@ -413,9 +392,13 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                 mediaPlayer = null;
             }
 
-            currentTrackPosition++;
-            if (currentTrackPosition >= tracksList.size()) {
-                currentTrackPosition = 0; // Loop back to the start
+            if (isPlayingFromAlbum) {
+                currentTrackPosition++;
+                if (currentTrackPosition >= tracksList.size()) {
+                    currentTrackPosition = 0;
+                }
+            } else {
+                currentTrackPosition = (int) (Math.random() * tracksList.size());
             }
             Tracks nextTrack = tracksList.get(currentTrackPosition);
 
@@ -433,9 +416,13 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     public void playPreviousTrack() {
         if (tracksList != null && !tracksList.isEmpty()) {
             if (tracksList.size() > 1) {
-                currentTrackPosition--;
-                if (currentTrackPosition < 0) {
-                    currentTrackPosition = tracksList.size() - 1;
+                if (isPlayingFromAlbum) {
+                    currentTrackPosition--;
+                    if (currentTrackPosition < 0) {
+                        currentTrackPosition = tracksList.size() - 1;
+                    }
+                } else {
+                    currentTrackPosition = (int) (Math.random() * tracksList.size());
                 }
             }
             updateAlbumTracksAdapter();
@@ -586,7 +573,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             mediaSession.release();
             mediaSession = null;
         }
-        unregisterReceiver(bluetoothReceiver);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(1);
     }
@@ -657,7 +643,6 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         mediaSession.setMediaButtonReceiver(null);
         mediaSession.setActive(true);
     }
-
 
     @Override
     protected void onResume() {

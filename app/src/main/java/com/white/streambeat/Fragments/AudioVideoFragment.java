@@ -21,7 +21,6 @@ public class AudioVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_audio_video, container, false);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
         btnBackAudioVideo = view.findViewById(R.id.btnBackAudioVideo);

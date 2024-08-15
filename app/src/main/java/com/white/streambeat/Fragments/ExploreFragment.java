@@ -100,7 +100,6 @@ public class ExploreFragment extends Fragment {
             sharedViewModel.clearSearchResults();
         } else {
             dialog.show();
-            // Trigger search in sharedViewModel
             sharedViewModel.search(query);
             Log.d("ExploreFragment", "Performing search with query: " + query);
 
@@ -152,7 +151,6 @@ public class ExploreFragment extends Fragment {
                                 }
                             }
                         }
-//                        displayLikedTracks();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }

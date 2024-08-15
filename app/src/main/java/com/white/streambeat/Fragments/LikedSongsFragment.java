@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.white.streambeat.Adapters.TracksAdapter;
 import com.white.streambeat.Connections.ServerConnector;
-import com.white.streambeat.Models.SharedViewModel;
 import com.white.streambeat.R;
 
 public class LikedSongsFragment extends Fragment {
@@ -29,7 +27,6 @@ public class LikedSongsFragment extends Fragment {
     RecyclerView rvLikedSongs;
     TracksAdapter tracksAdapter;
     FirebaseUser firebaseUser;
-    SharedViewModel sharedViewModel;
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -39,7 +36,6 @@ public class LikedSongsFragment extends Fragment {
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         rvLikedSongs = view.findViewById(R.id.rvLikedSongs);
         rvLikedSongs.setLayoutManager(new LinearLayoutManager(getContext()));

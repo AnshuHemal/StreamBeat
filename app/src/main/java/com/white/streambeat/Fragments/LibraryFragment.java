@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,33 +29,24 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.white.streambeat.Activities.SetupArtistsActivity;
 import com.white.streambeat.Adapters.ArtistAdapter;
 import com.white.streambeat.Connections.ServerConnector;
-import com.white.streambeat.Models.SharedViewModel;
-import com.white.streambeat.Models.Tracks;
 import com.white.streambeat.R;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class LibraryFragment extends Fragment {
     LinearLayout llLikedSongs, llAddMoreArtists;
     TextView likeSongsCountTxt;
-    List<Integer> likedTracksIds = new ArrayList<>();
-    SharedViewModel sharedViewModel;
 
     @SuppressLint({"MissingInflatedId", "SetTextI18n"})
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_library, container, false);
+        View view = inflater.inflate(R.layout.fragment_library, container, false);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
-
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         llLikedSongs = view.findViewById(R.id.llLikedSongs);
         llAddMoreArtists = view.findViewById(R.id.addMoreArtistsLL);
@@ -79,7 +69,7 @@ public class LibraryFragment extends Fragment {
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.replace(R.id.frameLayout, likedSongsFragment);
                 transaction.commit();
-            },100);
+            }, 100);
         });
 
         llAddMoreArtists.setOnClickListener(v -> {
@@ -117,59 +107,5 @@ public class LibraryFragment extends Fragment {
             }
         };
         Volley.newRequestQueue(requireContext()).add(stringRequest);
-    }
-
-    public void fetchUsersLikedTracks() {
-        StringRequest stringRequest = new StringRequest(
-                Request.Method.POST,
-                ServerConnector.FETCH_USERS_LIKED_TRACKS,
-                response -> {
-                    ServerConnector.likedTracksList.clear();
-                    likedTracksIds.clear();
-                    try {
-                        JSONArray jsonArray = new JSONArray(response);
-
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            int trackId = jsonArray.getJSONObject(i).getInt("track_id");
-                            likedTracksIds.add(trackId);
-
-                            for (Tracks track : ServerConnector.allTracksList) {
-                                if (track.getTrack_id() == trackId) {
-                                    track.setLikedByUser(true);
-                                }
-                            }
-                        }
-                        storeLikedTracksToServerConnector();
-
-                    } catch (Exception e) {
-                        Log.d(TAG, "fetchUsersLikedTracks: " + e.getMessage());
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }, error -> Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show()
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                HashMap<String, String> map = new HashMap<>();
-                map.put("user_phone", Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhoneNumber());
-                return map;
-            }
-        };
-        Volley.newRequestQueue(requireContext()).add(stringRequest);
-    }
-
-    private void storeLikedTracksToServerConnector() {
-        List<Tracks> allTracks = ServerConnector.allTracksList;
-        if (ServerConnector.likedTracksList == null) {
-            ServerConnector.likedTracksList = new ArrayList<>();
-        } else {
-            ServerConnector.likedTracksList.clear();
-        }
-        if (allTracks != null) {
-            for (Tracks track : allTracks) {
-                if (likedTracksIds.contains(track.getTrack_id())) {
-                    ServerConnector.likedTracksList.add(track);
-                }
-            }
-        }
     }
 }

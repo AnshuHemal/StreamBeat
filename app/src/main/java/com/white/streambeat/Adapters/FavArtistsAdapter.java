@@ -1,6 +1,5 @@
 package com.white.streambeat.Adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,12 +47,6 @@ public class FavArtistsAdapter extends RecyclerView.Adapter<FavArtistsAdapter.Vi
     @Override
     public int getItemCount() {
         return artistsList.size();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void updateArtistsList(List<Artists> newArtistsList) {
-        this.artistsList = newArtistsList;
-        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

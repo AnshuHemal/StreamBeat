@@ -38,23 +38,19 @@ public class TrackViewArtistsSheetFragment extends BottomSheetDialogFragment {
         artistsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if (tracks != null && tracks.getArtist_names() != null) {
-            List<Artists> artistsList = ServerConnector.artists;
+            List<Artists> artistsList = new ArrayList<>(ServerConnector.allArtistsList);
 
-            if (artistsList != null) {
-                for (Artists artist : artistsList) {
-                    if (artist != null && artist.getArtist_name() != null) {
-                        for (String artistName : tracks.getArtist_names()) {
-                            if (artist.getArtist_name().equals(artistName)) {
-                                selectedArtists.add(artist);
-                            }
+            for (Artists artist : artistsList) {
+                if (artist != null && artist.getArtist_name() != null) {
+                    for (String artistName : tracks.getArtist_names()) {
+                        if (artist.getArtist_name().equals(artistName)) {
+                            selectedArtists.add(artist);
                         }
                     }
                 }
-                ArtistAdapter adapter = new ArtistAdapter(getContext(), selectedArtists);
-                artistsRecyclerView.setAdapter(adapter);
-            } else {
-                Log.e("TrackViewArtists", "Artists list from ViewModel is null.");
             }
+            ArtistAdapter adapter = new ArtistAdapter(getContext(), selectedArtists);
+            artistsRecyclerView.setAdapter(adapter);
         } else {
             Log.e("TrackViewArtists", "Tracks or artist names are null.");
         }

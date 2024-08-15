@@ -64,7 +64,7 @@ public class AlbumTracksFragment extends Fragment {
 
         assert getArguments() != null;
         albumTitle = getArguments().getString("album_title", "");
-        for (Albums album : sharedViewModel.getAllAlbumsList().getValue()) {
+        for (Albums album : ServerConnector.allAlbumsList) {
             if (album.getAlbum_title().equals(albumTitle)) {
                 albumCoverImageUrl = album.getCover_image_url();
             }

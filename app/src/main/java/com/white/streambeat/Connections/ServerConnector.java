@@ -30,12 +30,14 @@ public class ServerConnector {
     public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
     public static String GET_LIKED_SONGS_COUNT = serverUrl + "get_liked_songs_count";
 
+    public static List<Tracks> allTracksList = new ArrayList<>();
+    public static List<Artists> allArtistsList = new ArrayList<>();
+    public static List<Albums> allAlbumsList = new ArrayList<>();
+
     public static String userFullName = "";
     public static String userEmailAddress = "";
-    public static List<Artists> artists = new ArrayList<>();
     public static List<Artists> favoriteArtists = new ArrayList<>();
     public static int likedSongsCount = 0;
     public static List<Tracks> likedTracksList = new ArrayList<>();
-    public static List<Tracks> allTracksList = new ArrayList<>();
     public static List<Albums> logAlbumsList = new ArrayList<>();
 }

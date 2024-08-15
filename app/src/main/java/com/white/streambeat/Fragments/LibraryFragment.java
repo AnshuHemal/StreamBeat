@@ -133,7 +133,7 @@ public class LibraryFragment extends Fragment {
                             int trackId = jsonArray.getJSONObject(i).getInt("track_id");
                             likedTracksIds.add(trackId);
 
-                            for (Tracks track : Objects.requireNonNull(sharedViewModel.getAllTracksList().getValue())) {
+                            for (Tracks track : ServerConnector.allTracksList) {
                                 if (track.getTrack_id() == trackId) {
                                     track.setLikedByUser(true);
                                 }
@@ -158,7 +158,7 @@ public class LibraryFragment extends Fragment {
     }
 
     private void storeLikedTracksToServerConnector() {
-        List<Tracks> allTracks = sharedViewModel.getAllTracksList().getValue();
+        List<Tracks> allTracks = ServerConnector.allTracksList;
         if (ServerConnector.likedTracksList == null) {
             ServerConnector.likedTracksList = new ArrayList<>();
         } else {

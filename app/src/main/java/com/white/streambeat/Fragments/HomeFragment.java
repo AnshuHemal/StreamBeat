@@ -284,6 +284,7 @@ public class HomeFragment extends Fragment {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
                 response -> {
+                    ServerConnector.allArtistsList.clear();
                     Log.d(TAG, "fetchAllArtists response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -300,9 +301,7 @@ public class HomeFragment extends Fragment {
                                 allArtists.add(artists);
                             }
                             saveArtistsDetailsToSharedPreferences();
-                            ServerConnector.artists.clear();
-                            ServerConnector.artists.addAll(allArtists);
-                            sharedViewModel.setAllArtistsList(allArtists);
+                            ServerConnector.allArtistsList.addAll(allArtists);
                         }
 
                     } catch (Exception e) {
@@ -324,6 +323,7 @@ public class HomeFragment extends Fragment {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ALBUMS_DETAILS,
                 response -> {
+                    ServerConnector.allAlbumsList.clear();
                     Log.d(TAG, "fetchAllAlbums response: " + response);
                     if (response == null || response.isEmpty()) {
                         Toast.makeText(requireContext(), "Empty response from server", Toast.LENGTH_SHORT).show();
@@ -343,7 +343,7 @@ public class HomeFragment extends Fragment {
                                 allAlbums.add(albums);
                             }
                             saveAlbumsDetailsToSharedPreferences();
-                            sharedViewModel.setAllAlbumsList(allAlbums);
+                            ServerConnector.allAlbumsList.addAll(allAlbums);
                             fetchUserLogs();
                         }
 
@@ -398,10 +398,8 @@ public class HomeFragment extends Fragment {
                                 }
                             }
                         }
-
                         saveTracksDetailsToSharedPreferences();
                         ServerConnector.allTracksList.addAll(allTracks);
-                        sharedViewModel.setAllTracksList(allTracks);
                     } catch (JSONException e) {
                         Toast.makeText(getContext(), "JSON Parsing Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -558,7 +556,7 @@ public class HomeFragment extends Fragment {
                             int trackId = jsonArray.getJSONObject(i).getInt("track_id");
                             likedTracksIds.add(trackId);
 
-                            for (Tracks track : Objects.requireNonNull(sharedViewModel.getAllTracksList().getValue())) {
+                            for (Tracks track : ServerConnector.allTracksList) {
                                 if (track.getTrack_id() == trackId) {
                                     track.setLikedByUser(true);
                                 }
@@ -588,7 +586,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void storeLikedTracksToServerConnector() {
-        List<Tracks> allTracks = sharedViewModel.getAllTracksList().getValue();
+        List<Tracks> allTracks = ServerConnector.allTracksList;
         if (ServerConnector.likedTracksList == null) {
             ServerConnector.likedTracksList = new ArrayList<>();
         } else {
@@ -737,7 +735,7 @@ public class HomeFragment extends Fragment {
 
     private void filterLogAlbums(List<Integer> albumIdsFromHistory) {
         ServerConnector.logAlbumsList.clear();
-        List<Albums> filteredAlbums = Objects.requireNonNull(sharedViewModel.getAllAlbumsList().getValue()).stream()
+        List<Albums> filteredAlbums = ServerConnector.allAlbumsList.stream()
                 .filter(album -> albumIdsFromHistory.contains(album.getAlbum_id()))
                 .collect(Collectors.toList());
         ServerConnector.logAlbumsList.addAll(filteredAlbums);

@@ -69,7 +69,8 @@ public class ListeningHistoryFragment extends Fragment {
 
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        fetchAllAlbums();
+        allAlbums = ServerConnector.allAlbumsList;
+        filterAlbumsByDate();
         fetchUserLogs();
 
         btnBackLF.setOnClickListener(v -> {
@@ -83,15 +84,6 @@ public class ListeningHistoryFragment extends Fragment {
         });
 
         return view;
-    }
-
-    private void fetchAllAlbums() {
-        sharedViewModel.getAllAlbumsList().observe(getViewLifecycleOwner(), albums -> {
-            if (albums != null) {
-                allAlbums = new ArrayList<>(albums);
-                filterAlbumsByDate();
-            }
-        });
     }
 
     private void fetchUserLogs() {

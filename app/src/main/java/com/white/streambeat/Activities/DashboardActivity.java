@@ -488,7 +488,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     private void saveUserLog(Tracks track) {
         String album_title = track.getAlbum_title();
         int album_id = 0;
-        for (Albums album : Objects.requireNonNull(sharedViewModel.getAllAlbumsList().getValue())) {
+        for (Albums album : ServerConnector.allAlbumsList) {
             if (album.getAlbum_title().equals(album_title)) {
                 album_id = album.getAlbum_id();
                 break;

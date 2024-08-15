@@ -146,7 +146,7 @@ public class ExploreFragment extends Fragment {
                             int trackId = jsonArray.getJSONObject(i).getInt("track_id");
                             likedTracksIds.add(trackId);
 
-                            for (Tracks track : sharedViewModel.getAllTracksList().getValue()) {
+                            for (Tracks track : ServerConnector.allTracksList) {
                                 if (track.getTrack_id() == trackId) {
                                     track.setLikedByUser(true);
                                 }

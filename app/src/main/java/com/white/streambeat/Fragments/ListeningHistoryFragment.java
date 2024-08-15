@@ -4,13 +4,18 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,8 +46,10 @@ public class ListeningHistoryFragment extends Fragment {
     private SharedViewModel sharedViewModel;
     private RecyclerView recyclerView;
     private List<Albums> allAlbums = new ArrayList<>();
-    private UserLogsAdapter adapter; // Update this adapter to handle albums
+    private UserLogsAdapter adapter;
     private final Map<String, List<Albums>> dateWithAlbumsMap = new HashMap<>();
+
+    ImageView btnBackLF;
 
     @SuppressLint("ConstantLocale")
     private static final SimpleDateFormat INPUT_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -54,7 +61,9 @@ public class ListeningHistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_listening_history, container, false);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.small_push);
 
+        btnBackLF = view.findViewById(R.id.btnBackLF);
         recyclerView = view.findViewById(R.id.listeningHistoryRV);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -62,6 +71,16 @@ public class ListeningHistoryFragment extends Fragment {
 
         fetchAllAlbums();
         fetchUserLogs();
+
+        btnBackLF.setOnClickListener(v -> {
+            v.startAnimation(animation);
+            new Handler().postDelayed(() -> {
+                Fragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.frameLayout, profileFragment);
+                transaction.commit();
+            },100);
+        });
 
         return view;
     }
@@ -151,7 +170,7 @@ public class ListeningHistoryFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     private void displayAlbums() {
         if (adapter == null) {
-            adapter = new UserLogsAdapter(getContext(), dateWithAlbumsMap); // Update the adapter for albums
+            adapter = new UserLogsAdapter(getContext(), getParentFragmentManager(), dateWithAlbumsMap); // Update the adapter for albums
             recyclerView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();

@@ -3,9 +3,12 @@ package com.white.streambeat.Adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,6 +42,16 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     List<Object> searchResults;
     FragmentManager fragmentManager;
     private int currentlyPlayingPosition = -1;
+
+    private OnItemClickListener onItemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Albums album);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public SearchAdapter(Context context, FragmentManager fragmentManager, List<Object> searchResults) {
         this.context = context;
@@ -105,7 +118,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.trackName.setText(track.getTrack_name());
 
         StringBuilder artistsBuilder = new StringBuilder();
-        for (int i=0; i<track.getArtist_names().size(); i++) {
+        for (int i = 0; i < track.getArtist_names().size(); i++) {
             artistsBuilder.append(track.getArtist_names().get(i));
             if (i < track.getArtist_names().size() - 1) {
                 artistsBuilder.append(", ");
@@ -151,10 +164,16 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void configureAlbumViewHolder(AlbumViewHolder holder, Albums album) {
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.small_push);
         holder.albumName.setText(album.getAlbum_title());
         Glide.with(context).load(album.getCover_image_url()).into(holder.albumCover);
 
         holder.itemView.setOnClickListener(v -> {
+            v.startAnimation(animation);
+            if (onItemClickListener != null) {
+                new Handler().postDelayed(() -> onItemClickListener.onItemClick(album), 100);
+
+            }
             int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 Object item = searchResults.get(adapterPosition);

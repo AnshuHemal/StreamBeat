@@ -1,27 +1,34 @@
 package com.white.streambeat.Adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.R;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHolder> {
     Context context;
+    FragmentManager fragmentManager;
     Map<String, List<Albums>> dateWithTracksMap;
 
-    public UserLogsAdapter(Context context, Map<String, List<Albums>> dateWithTracksMap) {
+    public UserLogsAdapter(Context context, FragmentManager fragmentManager, Map<String, List<Albums>> dateWithTracksMap) {
         this.context = context;
+        this.fragmentManager = fragmentManager;
         this.dateWithTracksMap = dateWithTracksMap;
     }
 
@@ -34,14 +41,17 @@ public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull UserLogsAdapter.ViewHolder holder, int position) {
+
         String date = (String) dateWithTracksMap.keySet().toArray()[position];
         List<Albums> albums = dateWithTracksMap.get(date);
 
         holder.dateTextView.setText(date);
 
-        PopularAlbumsAdapter albumsAdapter = new PopularAlbumsAdapter(context, albums, null);
-        holder.tracksRecyclerView.setAdapter(albumsAdapter);
+        SearchAdapter searchAdapter = new SearchAdapter(context, null, Arrays.asList(Objects.requireNonNull(albums).toArray()));
+        holder.tracksRecyclerView.setAdapter(searchAdapter);
         holder.tracksRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+        searchAdapter.setOnItemClickListener(album -> navigateToAlbumTracksFragment(fragmentManager, album.getAlbum_title()));
     }
 
     @Override
@@ -52,11 +62,26 @@ public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView dateTextView;
         RecyclerView tracksRecyclerView;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             dateTextView = itemView.findViewById(R.id.userLogsDate);
             tracksRecyclerView = itemView.findViewById(R.id.userLogRV);
+        }
+    }
+
+    public void navigateToAlbumTracksFragment(FragmentManager fragmentManager, String album_title) {
+        Bundle bundle = new Bundle();
+        bundle.putString("album_title", album_title);
+
+        AlbumTracksFragment albumTracksFragment = new AlbumTracksFragment();
+        albumTracksFragment.setArguments(bundle);
+
+        if (fragmentManager != null && !fragmentManager.isDestroyed()) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.frameLayout, albumTracksFragment)
+                    .commit();
         }
     }
 }

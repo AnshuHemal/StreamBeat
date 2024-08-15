@@ -24,8 +24,8 @@
         <!-- Back Button -->
         <ImageView
             android:id="@+id/btnBackLF"
-            android:layout_width="20dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_gravity="start"
             android:src="@drawable/arrow_left"
             app:tint="@color/white" />
@@ -40,7 +40,7 @@
             android:gravity="center"
             android:text="Recently played"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </androidx.appcompat.widget.Toolbar>

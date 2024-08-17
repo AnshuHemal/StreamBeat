@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerConnector {
-    public static String serverUrl = "https://anantpolymers.com/StreamBeat/sb_users.php/";
-//    public static String serverUrl = "http://192.168.63.36/StreamBeat/sb_users.php";
+//    public static String serverUrl = "https://anantpolymers.com/StreamBeat/sb_users.php/";
+    public static String serverUrl = "http://192.168.63.36/StreamBeat/sb_users.php/";
     public static String LOGIN_URL = serverUrl + "login";
     public static String REGISTER_URL = serverUrl + "register";
     public static String CHECK_LOGIN_STATUS = serverUrl + "check_login_status";
@@ -25,9 +25,10 @@ public class ServerConnector {
     public static String REMOVE_LIKED_TRACKS = serverUrl + "remove_liked_tracks";
     public static String FETCH_USERS_LIKED_TRACKS = serverUrl + "fetch_users_liked_tracks";
     public static String GET_POPULAR_ALBUMS = serverUrl + "get_popular_albums";
+    public static String GET_RECOMMENDED_ALBUMS = serverUrl + "get_recommended_albums";
+    public static String GET_NEW_RELEASES_ALBUMS = serverUrl + "get_new_releases_albums";
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";
     public static String SAVE_USER_LOGS = serverUrl + "save_user_logs";
-    public static String GET_RANDOM_ARTISTS = serverUrl + "get_fav_artists";
     public static String GET_LIKED_SONGS_COUNT = serverUrl + "get_liked_songs_count";
 
     public static List<Tracks> allTracksList = new ArrayList<>();

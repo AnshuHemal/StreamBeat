@@ -16,20 +16,21 @@ import com.white.streambeat.Fragments.AlbumTracksFragment;
 import com.white.streambeat.Models.Albums;
 import com.white.streambeat.R;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHolder> {
-    Context context;
+    private final Context context;
+    private final Map<String, List<Albums>> dateWithAlbumsMap;
     FragmentManager fragmentManager;
-    Map<String, List<Albums>> dateWithTracksMap;
 
-    public UserLogsAdapter(Context context, FragmentManager fragmentManager, Map<String, List<Albums>> dateWithTracksMap) {
+    public UserLogsAdapter(Context context, Map<String, List<Albums>> dateWithAlbumsMap, FragmentManager fragmentManager) {
         this.context = context;
+        this.dateWithAlbumsMap = dateWithAlbumsMap;
         this.fragmentManager = fragmentManager;
-        this.dateWithTracksMap = dateWithTracksMap;
     }
 
     @NonNull
@@ -42,8 +43,8 @@ public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull UserLogsAdapter.ViewHolder holder, int position) {
 
-        String date = (String) dateWithTracksMap.keySet().toArray()[position];
-        List<Albums> albums = dateWithTracksMap.get(date);
+        String date = new ArrayList<>(dateWithAlbumsMap.keySet()).get(position);
+        List<Albums> albums = dateWithAlbumsMap.get(date);
 
         holder.dateTextView.setText(date);
 
@@ -56,7 +57,7 @@ public class UserLogsAdapter extends RecyclerView.Adapter<UserLogsAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return dateWithTracksMap.size();
+        return dateWithAlbumsMap.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

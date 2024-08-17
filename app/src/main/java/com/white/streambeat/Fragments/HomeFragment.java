@@ -64,7 +64,9 @@ public class HomeFragment extends Fragment {
             homeLogAlbumRV;
 
     List<Artists> artists = new ArrayList<>();
-    List<Albums> popularAlbums = new ArrayList<>();
+    List<Albums> popularAlbums;
+    List<Albums> recommendedAlbums;
+    List<Albums> newReleasesAlbums;
     List<Artists> allArtists = new ArrayList<>();
     List<Albums> allAlbums = new ArrayList<>();
     List<Tracks> allTracks = new ArrayList<>();
@@ -117,23 +119,9 @@ public class HomeFragment extends Fragment {
         fetchFavoriteArtists();
         fetchLikedSongsCount();
         fetchUsersLikedTracks();
-//        fetchPopularAlbums();
-
-        List<Albums> albums = new ArrayList<>();
-        recyclerViewReleases.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        albums.add(new Albums(201, "Bad Newz", "https://i.scdn.co/image/ab67616d00001e023eacecab70822f60b71be0cd"));
-        albums.add(new Albums(202, "Ishq Vishk Rebound", "https://i.scdn.co/image/ab67616d0000b2738e683ee9f83a4b1dc502acf0"));
-        albums.add(new Albums(203, "Mr. & Mrs. Mahi", "https://i.scdn.co/image/ab67616d0000b273373b21b6dfdb6cd71e03101f"));
-        albumsAdapter = new PopularAlbumsAdapter(getContext(), albums, getParentFragmentManager());
-        recyclerViewReleases.setAdapter(albumsAdapter);
-
-        List<Albums> albumsRecommend = new ArrayList<>();
-        recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        albumsRecommend.add(new Albums(201, "Tera Fitoor (From Genius)", "https://i.scdn.co/image/ab67616d0000b273b10cd00a5865ea695f322dd7"));
-        albumsRecommend.add(new Albums(202, "Ve Kamleya ", "https://i.scdn.co/image/ab67616d0000b27339890c916878b32aebd1d0ee"));
-        albumsRecommend.add(new Albums(203, "Satranga (From 'ANIMAL')", "https://i.scdn.co/image/ab67616d0000b273021d7017f73387b008eab271"));
-        albumsAdapter = new PopularAlbumsAdapter(getContext(), albumsRecommend, getParentFragmentManager());
-        recyclerViewRecommended.setAdapter(albumsAdapter);
+        fetchPopularAlbums();
+        fetchRecommendedAlbums();
+        fetchNewReleasesAlbums();
 
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         artists = new ArrayList<>();
@@ -144,6 +132,16 @@ public class HomeFragment extends Fragment {
         popularAlbums = new ArrayList<>();
         albumsAdapter = new PopularAlbumsAdapter(getContext(), popularAlbums, getParentFragmentManager());
         recyclerViewPopularAlbums.setAdapter(albumsAdapter);
+
+        recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        recommendedAlbums = new ArrayList<>();
+        albumsAdapter = new PopularAlbumsAdapter(getContext(), recommendedAlbums, getParentFragmentManager());
+        recyclerViewRecommended.setAdapter(albumsAdapter);
+
+        recyclerViewReleases.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        newReleasesAlbums = new ArrayList<>();
+        albumsAdapter = new PopularAlbumsAdapter(getContext(), newReleasesAlbums, getParentFragmentManager());
+        recyclerViewReleases.setAdapter(albumsAdapter);
 
         homeLikedSongsLL.setOnClickListener(v -> {
             v.startAnimation(animation);
@@ -169,7 +167,9 @@ public class HomeFragment extends Fragment {
             fetchAllArtists();
             fetchAllAlbums();
             fetchAllTracks();
-            fetchPopularAlbums();
+//            fetchPopularAlbums();
+//            fetchRecommendedAlbums();
+//            fetchNewReleasesAlbums();
             fetchFavoriteArtists();
             fetchUserInfo();
         }
@@ -180,6 +180,8 @@ public class HomeFragment extends Fragment {
     private void restoreDataFromSharedPreferences() {
         String artistsJson = sharedPreferences.getString("artists_list", "");
         String albumsJson = sharedPreferences.getString("popular_albums_list", "");
+        String recommendedAlbumsJson = sharedPreferences.getString("recommended_albums_list", "");
+        String newReleasesAlbumsJson = sharedPreferences.getString("new_releases_albums_list", "");
         if (!artistsJson.isEmpty()) {
             try {
                 JSONArray artistsArray = new JSONArray(artistsJson);
@@ -207,6 +209,40 @@ public class HomeFragment extends Fragment {
                     String albumTitle = albumObj.getString("album_title");
                     String image_url = albumObj.getString("cover_image_url");
                     popularAlbums.add(new Albums(album_id, albumTitle, image_url));
+                }
+                albumsAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!recommendedAlbumsJson.isEmpty()) {
+            try {
+                JSONArray albumsArray = new JSONArray(albumsJson);
+                recommendedAlbums.clear();
+                for (int i = 0; i < albumsArray.length(); i++) {
+                    JSONObject albumObj = albumsArray.getJSONObject(i);
+                    int album_id = albumObj.getInt("album_id");
+                    String albumTitle = albumObj.getString("album_title");
+                    String image_url = albumObj.getString("cover_image_url");
+                    recommendedAlbums.add(new Albums(album_id, albumTitle, image_url));
+                }
+                albumsAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (!newReleasesAlbumsJson.isEmpty()) {
+            try {
+                JSONArray albumsArray = new JSONArray(albumsJson);
+                newReleasesAlbums.clear();
+                for (int i = 0; i < albumsArray.length(); i++) {
+                    JSONObject albumObj = albumsArray.getJSONObject(i);
+                    int album_id = albumObj.getInt("album_id");
+                    String albumTitle = albumObj.getString("album_title");
+                    String image_url = albumObj.getString("cover_image_url");
+                    newReleasesAlbums.add(new Albums(album_id, albumTitle, image_url));
                 }
                 albumsAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
@@ -441,7 +477,109 @@ public class HomeFragment extends Fragment {
                                 popularAlbums.add(new Albums(artist_id, artistName, image_url));
                             }
                             albumsAdapter.notifyDataSetChanged();
-                            saveAlbumsToSharedPreferences();
+                            savePopularAlbumsToSharedPreferences();
+                        } catch (Exception e) {
+                            unameTxt.setText(e.getMessage());
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            onFetchComplete();
+                        }
+                    }
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("key_phone", firebaseUser.getPhoneNumber());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void fetchRecommendedAlbums() {
+        dialog.show();
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_RECOMMENDED_ALBUMS,
+                new Response.Listener<String>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            recommendedAlbums.clear();
+                            JSONObject j = new JSONObject(response);
+                            JSONArray jsonArray = j.getJSONArray("response_recommended_albums");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
+
+                                int album_id = artistObj.getInt("album_id");
+                                String albumTitle = artistObj.getString("album_title");
+                                String imageUrl = "";
+                                for (Albums album : ServerConnector.allAlbumsList) {
+                                    if (album.getAlbum_title().equals(albumTitle)) {
+                                        imageUrl = album.getCover_image_url();
+                                        break;
+                                    }
+                                }
+                                recommendedAlbums.add(new Albums(album_id, albumTitle, imageUrl));
+                            }
+                            albumsAdapter.notifyDataSetChanged();
+                            saveRecommendedAlbumsToSharedPreferences();
+                        } catch (Exception e) {
+                            unameTxt.setText(e.getMessage());
+                            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } finally {
+                            onFetchComplete();
+                        }
+                    }
+                }, error -> {
+            Toast.makeText(getContext(), "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            onFetchComplete();
+        }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("key_phone", firebaseUser.getPhoneNumber());
+                return map;
+            }
+        };
+        Volley.newRequestQueue(requireContext()).add(stringRequest);
+    }
+
+    private void fetchNewReleasesAlbums() {
+        dialog.show();
+        StringRequest stringRequest = new StringRequest(
+                Request.Method.POST,
+                ServerConnector.GET_NEW_RELEASES_ALBUMS,
+                new Response.Listener<String>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            newReleasesAlbums.clear();
+                            JSONObject j = new JSONObject(response);
+                            JSONArray jsonArray = j.getJSONArray("response_new_releases_albums");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject artistObj = jsonArray.getJSONObject(i);
+
+                                int album_id = artistObj.getInt("album_id");
+                                String albumTitle = artistObj.getString("album_title");
+                                String imageUrl = "";
+                                for (Albums album : ServerConnector.allAlbumsList) {
+                                    if (album.getAlbum_title().equals(albumTitle)) {
+                                        imageUrl = album.getCover_image_url();
+                                        break;
+                                    }
+                                }
+                                newReleasesAlbums.add(new Albums(album_id, albumTitle, imageUrl));
+                            }
+                            albumsAdapter.notifyDataSetChanged();
+                            saveNewReleasesAlbumsToSharedPreferences();
                         } catch (Exception e) {
                             unameTxt.setText(e.getMessage());
                             Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -601,7 +739,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void saveAlbumsToSharedPreferences() {
+    private void savePopularAlbumsToSharedPreferences() {
         JSONArray jsonArray = new JSONArray();
         for (Albums artist : popularAlbums) {
             JSONObject artistObj = new JSONObject();
@@ -615,6 +753,40 @@ public class HomeFragment extends Fragment {
             }
         }
         sharedPreferences.edit().putString("popular_albums_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
+    }
+
+    private void saveRecommendedAlbumsToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Albums artist : recommendedAlbums) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("album_id", artist.getAlbum_id());
+                artistObj.put("album_title", artist.getAlbum_id());
+                artistObj.put("cover_image_url", artist.getCover_image_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("recommended_albums_list", jsonArray.toString()).apply();
+        sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
+    }
+
+    private void saveNewReleasesAlbumsToSharedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (Albums artist : newReleasesAlbums) {
+            JSONObject artistObj = new JSONObject();
+            try {
+                artistObj.put("album_id", artist.getAlbum_id());
+                artistObj.put("album_title", artist.getAlbum_id());
+                artistObj.put("cover_image_url", artist.getCover_image_url());
+                jsonArray.put(artistObj);
+            } catch (JSONException e) {
+                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.edit().putString("new_releases_albums_list", jsonArray.toString()).apply();
         sharedPreferences.edit().putBoolean(PREF_DATA_FETCHED, true).apply();
     }
 

@@ -48,6 +48,7 @@ dependencies {
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.core:core:1.10.1")
     implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation("mysql:mysql-connector-java:8.0.29")
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

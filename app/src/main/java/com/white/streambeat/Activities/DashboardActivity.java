@@ -301,7 +301,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                         Bitmap bitmap = ((BitmapDrawable) miniPlayerImage.getDrawable()).getBitmap();
                         Palette.from(bitmap).generate(palette -> {
                             if (palette != null) {
-                                int dominantColor = palette.getDarkMutedColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightTheme));
+                                int dominantColor = palette.getDarkVibrantColor(ContextCompat.getColor(DashboardActivity.this, R.color.lightTheme));
                                 ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), miniPlayerView.getSolidColor(), dominantColor);
                                 colorAnimation.setDuration(300);
                                 colorAnimation.addUpdateListener(animator -> miniPlayerView.setBackgroundColor((int) animator.getAnimatedValue()));

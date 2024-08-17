@@ -162,7 +162,7 @@ public class ListeningHistoryFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     private void displayAlbums() {
         if (adapter == null) {
-            adapter = new UserLogsAdapter(getContext(), getParentFragmentManager(), dateWithAlbumsMap); // Update the adapter for albums
+            adapter = new UserLogsAdapter(getContext(), dateWithAlbumsMap, getParentFragmentManager()); // Update the adapter for albums
             recyclerView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();

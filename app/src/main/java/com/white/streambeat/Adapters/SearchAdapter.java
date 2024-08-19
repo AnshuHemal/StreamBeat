@@ -102,7 +102,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 view = inflater.inflate(R.layout.search_track_layout, parent, false);
                 viewHolder = new TrackViewHolder(view);
                 break;
-            case TYPE_HISTORY:  // Inflate layout for history
+            case TYPE_HISTORY:
                 view = inflater.inflate(R.layout.search_history_layout, parent, false);
                 viewHolder = new HistoryViewHolder(view);
                 break;
@@ -150,7 +150,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         if (position == currentlyPlayingPosition) {
-            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightGreen));
+            holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
         } else {
             holder.trackName.setTextColor(ContextCompat.getColor(context, R.color.lightWhite));
         }

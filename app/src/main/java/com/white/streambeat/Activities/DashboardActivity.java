@@ -3,6 +3,8 @@ package com.white.streambeat.Activities;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -62,6 +65,7 @@ import com.white.streambeat.TrackPlayerSheetFragment;
 import com.white.streambeat.databinding.ActivityDashboardBinding;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -95,6 +99,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
     private Handler handler;
     private Runnable updateProgressRunnable;
     private List<Tracks> tracksList;
+    private List<Tracks> unplayedTracksList;
     private int currentTrackPosition = -1;
 
     public void addToLikedSongs(Tracks track, String phoneNumber) {
@@ -141,6 +146,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
         dialog = new LoadingDialog(this);
         setupMediaSession();
+        createNotificationChannel();
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -210,6 +216,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         this.currentTrackPosition = position;
         this.isPlayingFromAlbum = isFromAlbum;
         this.tracksList = tracksList;
+        this.unplayedTracksList = new ArrayList<>(tracksList);
         playCurrentTrack();
     }
 
@@ -391,6 +398,11 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                 mediaPlayer.release();
                 mediaPlayer = null;
             }
+            Tracks nextTrack;
+
+            if (unplayedTracksList.isEmpty()) {
+                unplayedTracksList.addAll(tracksList);
+            }
 
             if (isPlayingFromAlbum) {
                 currentTrackPosition++;
@@ -398,9 +410,17 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                     currentTrackPosition = 0;
                 }
             } else {
-                currentTrackPosition = (int) (Math.random() * tracksList.size());
+                int randomIndex = (int) (Math.random() * unplayedTracksList.size());
+                nextTrack = unplayedTracksList.get(randomIndex);
+                // Remove the track from unplayed list
+                unplayedTracksList.remove(randomIndex);
+                currentTrackPosition = tracksList.indexOf(nextTrack);
             }
-            Tracks nextTrack = tracksList.get(currentTrackPosition);
+
+            if (currentTrackPosition < 0 || currentTrackPosition >= tracksList.size()) {
+                currentTrackPosition = 0;
+            }
+            nextTrack = tracksList.get(currentTrackPosition);
 
             playCurrentTrack();
             showMiniPlayer(nextTrack);
@@ -558,6 +578,19 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
                     }
                 });
     }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Music Channel";
+            String description = "Channel for music playback notifications";
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

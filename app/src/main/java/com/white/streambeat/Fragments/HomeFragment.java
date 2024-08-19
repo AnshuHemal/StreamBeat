@@ -77,7 +77,9 @@ public class HomeFragment extends Fragment {
     final int TOTAL_FETCHES = 7;
 
     FavArtistsAdapter favArtistsAdapter;
-    PopularAlbumsAdapter albumsAdapter;
+    PopularAlbumsAdapter popularAlbumsAdapter;
+    PopularAlbumsAdapter recommendedAlbumsAdapter;
+    PopularAlbumsAdapter newReleasesAlbumsAdapter;
     HomeLogAlbumsAdapter logAlbumsAdapter;
 
     private SharedViewModel sharedViewModel;
@@ -130,18 +132,18 @@ public class HomeFragment extends Fragment {
 
         recyclerViewPopularAlbums.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         popularAlbums = new ArrayList<>();
-        albumsAdapter = new PopularAlbumsAdapter(getContext(), popularAlbums, getParentFragmentManager());
-        recyclerViewPopularAlbums.setAdapter(albumsAdapter);
+        popularAlbumsAdapter = new PopularAlbumsAdapter(getContext(), popularAlbums, getParentFragmentManager());
+        recyclerViewPopularAlbums.setAdapter(popularAlbumsAdapter);
 
         recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         recommendedAlbums = new ArrayList<>();
-        albumsAdapter = new PopularAlbumsAdapter(getContext(), recommendedAlbums, getParentFragmentManager());
-        recyclerViewRecommended.setAdapter(albumsAdapter);
+        recommendedAlbumsAdapter = new PopularAlbumsAdapter(getContext(), recommendedAlbums, getParentFragmentManager());
+        recyclerViewRecommended.setAdapter(recommendedAlbumsAdapter);
 
         recyclerViewReleases.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         newReleasesAlbums = new ArrayList<>();
-        albumsAdapter = new PopularAlbumsAdapter(getContext(), newReleasesAlbums, getParentFragmentManager());
-        recyclerViewReleases.setAdapter(albumsAdapter);
+        newReleasesAlbumsAdapter = new PopularAlbumsAdapter(getContext(), newReleasesAlbums, getParentFragmentManager());
+        recyclerViewReleases.setAdapter(newReleasesAlbumsAdapter);
 
         homeLikedSongsLL.setOnClickListener(v -> {
             v.startAnimation(animation);
@@ -210,7 +212,7 @@ public class HomeFragment extends Fragment {
                     String image_url = albumObj.getString("cover_image_url");
                     popularAlbums.add(new Albums(album_id, albumTitle, image_url));
                 }
-                albumsAdapter.notifyDataSetChanged();
+                popularAlbumsAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -227,7 +229,7 @@ public class HomeFragment extends Fragment {
                     String image_url = albumObj.getString("cover_image_url");
                     recommendedAlbums.add(new Albums(album_id, albumTitle, image_url));
                 }
-                albumsAdapter.notifyDataSetChanged();
+                recommendedAlbumsAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -244,7 +246,7 @@ public class HomeFragment extends Fragment {
                     String image_url = albumObj.getString("cover_image_url");
                     newReleasesAlbums.add(new Albums(album_id, albumTitle, image_url));
                 }
-                albumsAdapter.notifyDataSetChanged();
+                newReleasesAlbumsAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 Toast.makeText(getContext(), "Error restoring popular albums: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -476,7 +478,7 @@ public class HomeFragment extends Fragment {
 
                                 popularAlbums.add(new Albums(artist_id, artistName, image_url));
                             }
-                            albumsAdapter.notifyDataSetChanged();
+                            popularAlbumsAdapter.notifyDataSetChanged();
                             savePopularAlbumsToSharedPreferences();
                         } catch (Exception e) {
                             unameTxt.setText(e.getMessage());
@@ -527,7 +529,7 @@ public class HomeFragment extends Fragment {
                                 }
                                 recommendedAlbums.add(new Albums(album_id, albumTitle, imageUrl));
                             }
-                            albumsAdapter.notifyDataSetChanged();
+                            recommendedAlbumsAdapter.notifyDataSetChanged();
                             saveRecommendedAlbumsToSharedPreferences();
                         } catch (Exception e) {
                             unameTxt.setText(e.getMessage());
@@ -578,7 +580,7 @@ public class HomeFragment extends Fragment {
                                 }
                                 newReleasesAlbums.add(new Albums(album_id, albumTitle, imageUrl));
                             }
-                            albumsAdapter.notifyDataSetChanged();
+                            newReleasesAlbumsAdapter.notifyDataSetChanged();
                             saveNewReleasesAlbumsToSharedPreferences();
                         } catch (Exception e) {
                             unameTxt.setText(e.getMessage());

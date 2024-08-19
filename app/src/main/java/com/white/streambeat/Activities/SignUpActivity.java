@@ -108,7 +108,6 @@ public class SignUpActivity extends AppCompatActivity {
                 Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
             }
         });
-
     }
 
     public boolean checkUtilsAreFillOrNot() {

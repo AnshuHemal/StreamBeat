@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -47,8 +48,11 @@ public class ExploreFragment extends Fragment {
     private LinearLayout no_keyword_found;
     FirebaseUser firebaseUser;
     List<Integer> likedTracksIds;
-
+    RecentSearches recentSearches;
     LoadingDialog dialog;
+
+    Handler handler = new Handler();
+    Runnable searchRunnable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,6 +67,7 @@ public class ExploreFragment extends Fragment {
         recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        recentSearches = new RecentSearches();
         fetchUsersLikedTracks();
 
         no_keyword_found = view.findViewById(R.id.llNoKeywordFound);
@@ -82,8 +87,18 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString();
-                search(query);
+                if (searchRunnable != null) {
+                    handler.removeCallbacks(searchRunnable);
+                }
+                searchRunnable = () -> {
+                    String query = s.toString().trim();
+                    if (!query.isEmpty()) {
+                        performSearch(query);
+                    } else {
+                        displayRecentSearches();
+                    }
+                };
+                handler.postDelayed(searchRunnable, 500);
             }
 
             @Override
@@ -92,35 +107,49 @@ public class ExploreFragment extends Fragment {
             }
         });
 
+        searchAdapter.setOnHistoryItemClickListener(historyItem -> {
+            recentSearches.removeHistoryItem(historyItem);
+            displayRecentSearches();
+        });
+
         return view;
     }
 
-    private void search(String query) {
-        if (query.isEmpty()) {
-            sharedViewModel.clearSearchResults();
-        } else {
-            dialog.show();
-            sharedViewModel.search(query);
-            Log.d("ExploreFragment", "Performing search with query: " + query);
+    private void performSearch(String query) {
+        dialog.show();
+        sharedViewModel.search(query);
+        recentSearches.add(query); // Store the full query in recent searches
+        Log.d("ExploreFragment", "Performing search with query: " + query);
 
-            sharedViewModel.getSearchResults().observe(getViewLifecycleOwner(), objects -> {
-                if (objects != null) {
-                    searchAdapter.updateData(objects);
-                    Log.d("ExploreFragment", "Search results updated: " + searchResults.size() + " items");
-                    dialog.dismiss();
-                    if (searchResults.isEmpty()) {
-                        no_keyword_found.setVisibility(View.GONE);
-                        recyclerViewSearchResults.setVisibility(View.GONE);
-                    } else {
-                        recyclerViewSearchResults.setVisibility(View.VISIBLE);
-                        no_keyword_found.setVisibility(View.GONE);
-                    }
-                } else {
-                    dialog.dismiss();
+        sharedViewModel.getSearchResults().observe(getViewLifecycleOwner(), objects -> {
+            if (objects != null) {
+                searchAdapter.updateData(objects);
+                Log.d("ExploreFragment", "Search results updated: " + searchResults.size() + " items");
+                dialog.dismiss();
+                if (searchResults.isEmpty()) {
                     no_keyword_found.setVisibility(View.GONE);
-                    recyclerViewSearchResults.setVisibility(View.INVISIBLE);
+                    recyclerViewSearchResults.setVisibility(View.GONE);
+                } else {
+                    recyclerViewSearchResults.setVisibility(View.VISIBLE);
+                    no_keyword_found.setVisibility(View.GONE);
                 }
-            });
+            } else {
+                dialog.dismiss();
+                no_keyword_found.setVisibility(View.GONE);
+                recyclerViewSearchResults.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    private void displayRecentSearches() {
+        List<String> history = recentSearches.getRecentSearches();
+        if (history.isEmpty()) {
+            no_keyword_found.setVisibility(View.GONE);
+            recyclerViewSearchResults.setVisibility(View.GONE);
+        } else {
+            searchAdapter.updateData(new ArrayList<>(history));
+            recyclerViewSearchResults.setVisibility(View.VISIBLE);
+            no_keyword_found.setVisibility(View.GONE);
         }
     }
 
@@ -168,4 +197,114 @@ public class ExploreFragment extends Fragment {
         };
         Volley.newRequestQueue(requireContext()).add(stringRequest);
     }
+
+    public class RecentSearches {
+        private final int MAX_RECENT_SEARCHES = 20;
+        private final SinglyLinkedList recentSearchesList;
+
+        public RecentSearches() {
+            recentSearchesList = new SinglyLinkedList();
+        }
+
+        public void add(String query) {
+            recentSearchesList.remove(query); // Remove old query if it exists
+            recentSearchesList.add(query); // Add new query to the list
+            if (recentSearchesList.size() > MAX_RECENT_SEARCHES) {
+                recentSearchesList.removeLast(); // Remove the oldest search if the list exceeds the max size
+            }
+        }
+
+        public List<String> getRecentSearches() {
+            return recentSearchesList.toArrayList();
+        }
+
+        public void removeHistoryItem(String item) {
+            recentSearches.recentSearchesList.remove(item);
+        }
+
+        public void clear() {
+            recentSearchesList.clear();
+        }
+
+        public class SinglyLinkedList {
+            private Node head;
+            private int size = 0;
+
+            private class Node {
+                String data;
+                Node next;
+
+                Node(String data) {
+                    this.data = data;
+                    this.next = null;
+                }
+            }
+
+            public SinglyLinkedList() {
+                this.head = null;
+            }
+
+            public void add(String data) {
+                Node newNode = new Node(data);
+                newNode.next = head;
+                head = newNode;
+                size++;
+            }
+
+            public void remove(String data) {
+                Node current = head;
+                Node previous = null;
+
+                while (current != null) {
+                    if (current.data.equals(data)) {
+                        if (previous == null) {
+                            head = current.next;
+                        } else {
+                            previous.next = current.next;
+                        }
+                        size--;
+                        return;
+                    }
+                    previous = current;
+                    current = current.next;
+                }
+            }
+
+            public void removeLast() {
+                if (head == null) return;
+                if (head.next == null) {
+                    head = null;
+                    size--;
+                    return;
+                }
+
+                Node current = head;
+                while (current.next.next != null) {
+                    current = current.next;
+                }
+                current.next = null;
+                size--;
+            }
+
+            public List<String> toArrayList() {
+                List<String> list = new ArrayList<>();
+                Node current = head;
+                while (current != null) {
+                    list.add(current.data);
+                    current = current.next;
+                }
+                return list;
+            }
+
+            public void clear() {
+                head = null;
+                size = 0;
+            }
+
+            public int size() {
+                return size;
+            }
+        }
+    }
+
 }

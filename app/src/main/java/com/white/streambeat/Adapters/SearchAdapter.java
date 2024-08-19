@@ -37,6 +37,7 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int TYPE_ALBUM = 1;
     private static final int TYPE_ARTIST = 2;
     private static final int TYPE_TRACK = 3;
+    private static final int TYPE_HISTORY = 4;
 
     private final Context context;
     List<Object> searchResults;
@@ -44,9 +45,18 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private int currentlyPlayingPosition = -1;
 
     private OnItemClickListener onItemClickListener;
+    OnHistoryItemClickListener onHistoryItemClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(Albums album);
+    }
+
+    public interface OnHistoryItemClickListener {
+        void onHistoryItemClear(String historyItem);
+    }
+
+    public void setOnHistoryItemClickListener(OnHistoryItemClickListener listener) {
+        this.onHistoryItemClickListener = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -92,6 +102,10 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 view = inflater.inflate(R.layout.search_track_layout, parent, false);
                 viewHolder = new TrackViewHolder(view);
                 break;
+            case TYPE_HISTORY:  // Inflate layout for history
+                view = inflater.inflate(R.layout.search_history_layout, parent, false);
+                viewHolder = new HistoryViewHolder(view);
+                break;
         }
         assert viewHolder != null;
         return viewHolder;
@@ -110,6 +124,9 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 break;
             case TYPE_TRACK:
                 configureTrackViewHolder((TrackViewHolder) holder, (Tracks) item, position);
+                break;
+            case TYPE_HISTORY:
+                configureHistoryViewHolder((HistoryViewHolder) holder, (String) item);
                 break;
         }
     }
@@ -193,6 +210,19 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.itemView.setOnClickListener(v -> Toast.makeText(context, "Artist", Toast.LENGTH_SHORT).show());
     }
 
+    private void configureHistoryViewHolder(HistoryViewHolder holder, String historyItem) {
+        holder.historyText.setText(historyItem);
+        holder.itemView.setOnClickListener(v -> {
+            // Handle click on history item, e.g., perform a search with the clicked history item
+            Toast.makeText(context, "Clicked on: " + historyItem, Toast.LENGTH_SHORT).show();
+        });
+        holder.itemView.findViewById(R.id.txtClearText).setOnClickListener(v -> {
+            if (onHistoryItemClickListener != null) {
+                onHistoryItemClickListener.onHistoryItemClear(historyItem);
+            }
+        });
+    }
+
     @Override
     public int getItemCount() {
         return searchResults.size();
@@ -207,6 +237,8 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return TYPE_ARTIST;
         } else if (item instanceof Tracks) {
             return TYPE_TRACK;
+        } else if (item instanceof String) {  // Type for search history
+            return TYPE_HISTORY;
         }
         return -1;
     }
@@ -246,6 +278,15 @@ public class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             artistName = itemView.findViewById(R.id.artistSearchName);
             artistImage = itemView.findViewById(R.id.artistSearchImage);
+        }
+    }
+
+    public static class HistoryViewHolder extends RecyclerView.ViewHolder {
+        TextView historyText;
+
+        public HistoryViewHolder(@NonNull View itemView) {
+            super(itemView);
+            historyText = itemView.findViewById(R.id.history_text);
         }
     }
 

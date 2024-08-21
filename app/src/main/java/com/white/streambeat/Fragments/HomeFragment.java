@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment {
 
     LoadingDialog dialog;
     private int fetchCount = 0;
-    final int TOTAL_FETCHES = 7;
+    final int TOTAL_FETCHES = 10;
 
     FavArtistsAdapter favArtistsAdapter;
     PopularAlbumsAdapter popularAlbumsAdapter;

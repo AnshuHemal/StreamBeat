@@ -42,6 +42,7 @@
                 android:fontFamily="@font/quicksand_medium"
                 android:text="Hemal Katariya"
                 android:textColor="@color/white"
+                android:layout_marginBottom="5dp"
                 android:textSize="18sp" />
 
         </LinearLayout>
@@ -219,39 +220,6 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewPopularAlbums"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
-                android:text="Bests of Artists"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewBestAlbums"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:id="@+id/moreLikeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
-                android:paddingStart="16dp"
-                android:text="More like {Artist Name}"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewMoreLike"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

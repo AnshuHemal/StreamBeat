@@ -82,17 +82,17 @@ public class AlbumTracksFragment extends Fragment {
             }
         });
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                FragmentManager fragmentManager = getParentFragmentManager();
-                if (!fragmentManager.isDestroyed()) {
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.frameLayout, new HomeFragment())
-                            .commit();
-                }
-            }
-        });
+//        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//                FragmentManager fragmentManager = getParentFragmentManager();
+//                if (!fragmentManager.isDestroyed()) {
+//                    fragmentManager.beginTransaction()
+//                            .replace(R.id.frameLayout, new HomeFragment())
+//                            .commit();
+//                }
+//            }
+//        });
 
         return view;
     }

@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment {
 
     LoadingDialog dialog;
     private int fetchCount = 0;
-    final int TOTAL_FETCHES = 10;
+    final int TOTAL_FETCHES = 7;
 
     FavArtistsAdapter favArtistsAdapter;
     PopularAlbumsAdapter popularAlbumsAdapter;
@@ -124,6 +124,7 @@ public class HomeFragment extends Fragment {
         fetchPopularAlbums();
         fetchRecommendedAlbums();
         fetchNewReleasesAlbums();
+        fetchUserLogs();
 
         recyclerViewFavArtists.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         artists = new ArrayList<>();

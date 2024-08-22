@@ -326,9 +326,10 @@ public class HomeFragment extends Fragment {
                     ServerConnector.allArtistsList.clear();
                     Log.d(TAG, "fetchAllArtists response: " + response);
                     try {
+                        ServerConnector.allArtistsList.clear();
                         JSONObject jsonObject = new JSONObject(response);
                         JSONArray jsonArray = jsonObject.getJSONArray("response_all_artists");
-                        allArtists.clear();
+                        allArtists = new ArrayList<>();
                         if (isAdded()) {
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject artistObj = jsonArray.getJSONObject(i);

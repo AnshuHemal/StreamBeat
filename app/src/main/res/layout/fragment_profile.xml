@@ -126,7 +126,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/mulish_medium"
                     android:paddingStart="20dp"
-                    android:text="What's New"
+                    android:text="Get My Log into File"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 

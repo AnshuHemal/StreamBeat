@@ -30,6 +30,7 @@ public class ServerConnector {
     public static String GET_USER_LOGS = serverUrl + "get_user_logs";
     public static String SAVE_USER_LOGS = serverUrl + "save_user_logs";
     public static String GET_LIKED_SONGS_COUNT = serverUrl + "get_liked_songs_count";
+    public static String WRITE_LOGS_TO_FILE = serverUrl + "write_user_history_to_file";
 
     public static List<Tracks> allTracksList = new ArrayList<>();
     public static List<Artists> allArtistsList = new ArrayList<>();

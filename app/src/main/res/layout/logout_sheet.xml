@@ -63,7 +63,7 @@
                     android:layout_marginEnd="20dp"
                     android:textColor="@color/white"
                     android:layout_weight="1"
-                    android:fontFamily="@font/quicksand_medium"
+                    android:fontFamily="@font/mulish_medium"
                     android:padding="15dp"
                     android:text="Cancel" />
 
@@ -76,7 +76,7 @@
                     android:layout_marginEnd="20dp"
                     android:layout_weight="1"
                     android:textColor="@color/white"
-                    android:fontFamily="@font/quicksand_medium"
+                    android:fontFamily="@font/mulish_medium"
                     android:padding="15dp"
                     android:text="Yes, Logout" />
 

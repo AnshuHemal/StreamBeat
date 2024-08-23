@@ -30,7 +30,7 @@
                 android:id="@+id/txtGreeting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:text="Good Morning, 👋 "
                 android:textColor="#E5E5E5"
                 android:textSize="15sp" />
@@ -39,20 +39,13 @@
                 android:id="@+id/txtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:text="Hemal Katariya"
                 android:textColor="@color/white"
                 android:layout_marginBottom="5dp"
                 android:textSize="18sp" />
 
         </LinearLayout>
-
-        <!-- Uncomment this if you need the notification bell image -->
-        <!-- <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/notification_bell"
-            app:tint="@color/white" /> -->
 
     </LinearLayout>
 
@@ -164,7 +157,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:paddingStart="16dp"
                 android:text="New Releases"
                 android:textColor="@color/white"
@@ -180,7 +173,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:paddingStart="16dp"
                 android:text="Recommended for today"
                 android:textColor="@color/white"
@@ -196,7 +189,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:paddingStart="16dp"
                 android:text="Your Favorite Artists"
                 android:textColor="@color/white"
@@ -212,7 +205,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
+                android:fontFamily="@font/mulish_medium"
                 android:paddingStart="16dp"
                 android:text="Popular Albums"
                 android:textColor="@color/white"

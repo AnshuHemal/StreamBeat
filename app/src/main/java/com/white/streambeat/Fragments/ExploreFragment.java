@@ -199,7 +199,7 @@ public class ExploreFragment extends Fragment {
     }
 
     public class RecentSearches {
-        private final int MAX_RECENT_SEARCHES = 20;
+        final int MAX_RECENT_SEARCHES = 20;
         private final SinglyLinkedList recentSearchesList;
 
         public RecentSearches() {
@@ -207,10 +207,10 @@ public class ExploreFragment extends Fragment {
         }
 
         public void add(String query) {
-            recentSearchesList.remove(query); // Remove old query if it exists
-            recentSearchesList.add(query); // Add new query to the list
+            recentSearchesList.remove(query); 
+            recentSearchesList.add(query);
             if (recentSearchesList.size() > MAX_RECENT_SEARCHES) {
-                recentSearchesList.removeLast(); // Remove the oldest search if the list exceeds the max size
+                recentSearchesList.removeLast();
             }
         }
 

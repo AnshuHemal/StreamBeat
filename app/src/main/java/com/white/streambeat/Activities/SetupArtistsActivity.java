@@ -114,7 +114,7 @@ public class SetupArtistsActivity extends AppCompatActivity {
                 Request.Method.GET,
                 ServerConnector.GET_ALL_ARTISTS_DETAILS,
                 response -> {
-                    Log.d(TAG, "fetchAllArtists response: " + response); // Add logging
+                    Log.d(TAG, "fetchAllArtists response: " + response);
                     dialog.dismiss();
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -130,12 +130,12 @@ public class SetupArtistsActivity extends AppCompatActivity {
                         }
                         artistAdapter.notifyDataSetChanged();
                     } catch (JSONException e) {
-                        Log.e(TAG, "JSON Error: " + e.getMessage()); // Add logging
+                        Log.e(TAG, "JSON Error: " + e.getMessage());
                         Toast.makeText(SetupArtistsActivity.this, "JSON Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 },
                 error -> {
-                    Log.e(TAG, "Error fetching artists: " + error.getMessage()); // Add logging
+                    Log.e(TAG, "Error fetching artists: " + error.getMessage());
                     dialog.dismiss();
                     Toast.makeText(SetupArtistsActivity.this, "Error fetching artists: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }

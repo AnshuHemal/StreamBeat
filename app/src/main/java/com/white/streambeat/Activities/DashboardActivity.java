@@ -163,7 +163,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
 
         frameLayout = findViewById(R.id.frameLayout);
         currentFragment = new HomeFragment();
-        loadFragment(currentFragment, false);
+        loadFragment(currentFragment);
 
         binding.bottomNavBar.setOnNavigationItemSelectedListener(item -> {
             Fragment fragment;
@@ -179,7 +179,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
             }
 
             currentFragment = fragment;
-            loadFragment(fragment, false);
+            loadFragment(fragment);
             return true;
         });
 
@@ -192,13 +192,13 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         });
     }
 
-    private void loadFragment(Fragment fragment, boolean addToBackStack) {
+    private void loadFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);
-        if (addToBackStack) {
-            fragmentTransaction.addToBackStack(null);
-        }
+//        if (addToBackStack) {
+//            fragmentTransaction.addToBackStack(null);
+//        }
         fragmentTransaction.commit();
     }
 
@@ -206,7 +206,7 @@ public class DashboardActivity extends AppCompatActivity implements TrackPlayerS
         if (currentFragment instanceof HomeFragment) {
             super.onBackPressed();
         } else {
-            loadFragment(new HomeFragment(), false);
+            loadFragment(new HomeFragment());
             currentFragment = new HomeFragment();
             binding.bottomNavBar.setSelectedItemId(R.id.navHome);
         }

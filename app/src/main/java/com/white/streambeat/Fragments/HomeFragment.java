@@ -269,7 +269,7 @@ public class HomeFragment extends Fragment {
         } else if (hourOfDay < 18) {
             greetingMessage = "Good Afternoon, \uD83D\uDC4B ";
         } else {
-            greetingMessage = "Good Morning, \uD83D\uDC4B ";
+            greetingMessage = "Good Evening, \uD83D\uDC4B ";
         }
         greetingTxt.setText(greetingMessage);
     }
@@ -335,9 +335,9 @@ public class HomeFragment extends Fragment {
                                 JSONObject artistObj = jsonArray.getJSONObject(i);
                                 int artistId = artistObj.getInt("artist_id");
                                 String artistName = artistObj.getString("artist_name");
-                                String imageUrlBase64 = artistObj.getString("image_url");
+                                String imageUrl = artistObj.getString("image_url");
 
-                                Artists artists = new Artists(artistId, artistName, imageUrlBase64);
+                                Artists artists = new Artists(artistId, artistName, imageUrl);
                                 allArtists.add(artists);
                             }
                             saveArtistsDetailsToSharedPreferences();

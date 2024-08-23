@@ -60,7 +60,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                 }
             } else {
                 String otp = binding.etCode.getText().toString();
-                PhoneAuthCredential credential = null;
+                PhoneAuthCredential credential;
                 if (!TextUtils.isEmpty(binding.etCode.getText()) || !otp.contains(" ")) {
                     credential = PhoneAuthProvider.getCredential(mVerificationId, otp);
                     showDialog();

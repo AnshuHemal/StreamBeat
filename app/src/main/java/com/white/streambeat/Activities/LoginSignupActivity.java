@@ -112,7 +112,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                                 response -> {
                                     if (response.equals("Success")){
                                         hideDialog();
-                                        startActivity(new Intent(getApplicationContext(), DashboardActivity.class));
+                                        startActivity(new Intent(LoginSignupActivity.this, DashboardActivity.class));
                                         finish();
                                     } else {
                                         hideDialog();
